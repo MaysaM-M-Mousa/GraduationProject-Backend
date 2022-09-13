@@ -3,6 +3,8 @@ const sequelize = require('../db/mysql')
 const Token = require('./token')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
+const User_Role = require('./user_role')
+const { ROLES, Role } = require('./role')
 
 const User = sequelize.define('user', {
     id: {
@@ -53,6 +55,9 @@ const User = sequelize.define('user', {
             if (user.changed('password')) {
                 user.password = await bcrypt.hash(user.password, 8)
             }
+        }, afterCreate: async function (user) {
+            const user_role = new User_Role({ userId: user.id, roleId: ROLES.User })
+            await user_role.save()
         }
     }
 });
@@ -86,7 +91,12 @@ User.prototype.toJSON = function () {
 User.findByCredentials = async function (userEmail, userPassword) {
 
     const user = await User.findOne({
-        where: { 'email': userEmail }
+        include: [{
+            model: Role,
+            required: true
+        }], where: {
+            email: userEmail
+        }
     })
 
     if (!user) {
