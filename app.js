@@ -5,10 +5,31 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
 
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+const options = {
+	definition: {
+		openapi: "3.0.0",
+		info: {
+			title: "App Docs",
+			version: "1.0.0",
+			description: "A Simple Documentations for App",
+		},
+	},
+	apis: ["./controllers/*.js"],
+};
+
+const specs = swaggerJsDoc(options);
+
 var app = express();
+
+if(process.env.ENVIRONMENT == 'DEVELOPMENT'){
+  app.use("/swagger", swaggerUI.serve, swaggerUI.setup(specs));
+}
 
 app.use(cors())
 app.use(logger('dev'));
