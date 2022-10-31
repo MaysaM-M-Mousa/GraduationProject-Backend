@@ -7,7 +7,7 @@ const auth = async (req, res, next) => {
         const token = req.header('Authorization').replace('Bearer ', '')
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        const user = await User.findByPk(decoded.id, { include: [{ model: Token, where: { stringToken: token } }, { model: Role }] })
+        const user = await User.findByPk(decoded.id, { include: [{ model: Token, where: { stringToken: token } }] })
 
         if (!user.tokens.length) {
             throw new Error()
@@ -15,7 +15,6 @@ const auth = async (req, res, next) => {
 
         req.user = user
         req.token = token
-        req.roles = user.roles
         next()
     } catch (e) {
         res.status(401).send({ error: 'Please authenticate.' })

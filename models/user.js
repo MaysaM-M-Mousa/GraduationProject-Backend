@@ -3,7 +3,6 @@ const sequelize = require('../db/mysql')
 const Token = require('./token')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
-const User_Role = require('./user_role')
 const { ROLES, Role } = require('./role')
 
 const User = sequelize.define('user', {
@@ -15,8 +14,7 @@ const User = sequelize.define('user', {
         type: Sequelize.STRING,
         field: 'first_name',
         allowNull: false
-    },
-    lastName: {
+    }, lastName: {
         type: Sequelize.STRING,
         field: 'last_name',
         allowNull: false
@@ -50,14 +48,12 @@ const User = sequelize.define('user', {
             user.email = user.email.toLowerCase()
             user.dataValues.id = null
             user.password = await bcrypt.hash(user.password, 8)
+            user.roleId = (user.roleId == ROLES.Parent || user.roleId == ROLES.KindergartenOwner) ? user.roleId : ROLES.Parent
         },
         beforeUpdate: async function (user) {
             if (user.changed('password')) {
                 user.password = await bcrypt.hash(user.password, 8)
             }
-        }, afterCreate: async function (user) {
-            const user_role = new User_Role({ userId: user.id, roleId: ROLES.User })
-            await user_role.save()
         }
     }
 });
@@ -91,12 +87,7 @@ User.prototype.toJSON = function () {
 User.findByCredentials = async function (userEmail, userPassword) {
 
     const user = await User.findOne({
-        include: [{
-            model: Role,
-            required: true
-        }], where: {
-            email: userEmail
-        }
+        where: { 'email': userEmail }
     })
 
     if (!user) {

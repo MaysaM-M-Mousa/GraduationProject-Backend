@@ -2,22 +2,16 @@ const Sequelize = require('sequelize')
 const sequelize = require('../db/mysql')
 
 const Role = sequelize.define('role', {
-    id: {
+    Id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true
-    },
-    roleID: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        unique: true
     },
     roleName: {
         type: Sequelize.STRING,
         field: 'role_name',
         allowNull: false
     }
-
 }, {
     freezeTableName: true,
     timestamps: false,
@@ -26,9 +20,9 @@ const Role = sequelize.define('role', {
 })
 
 const ROLES = {
-    Admin: 1,
-    Employee: 2,
-    User: 3
+    Parent: 1,
+    KindergartenOwner: 2,
+    Admin: 3
 }
 
 module.exports = { Role, ROLES }

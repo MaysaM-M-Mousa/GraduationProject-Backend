@@ -2,12 +2,9 @@ const roleChecker = (...roles) => {
     return (req, res, next) => {
         const allowedRoles = [...roles]
         
-        var myRoles = []
-        for (let key in req.roles) {
-            myRoles.push(req.roles[key].roleID);
-        }
+        var myRoles = req.user.roleId
         
-        const result = myRoles.map(role => allowedRoles.includes(role)).find(val => val === true)
+        const result = allowedRoles.includes(myRoles)
         
         if(!result) return res.status(401).send()
         
