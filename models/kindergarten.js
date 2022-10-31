@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize')
 const sequelize = require('../db/mysql')
 
+const phoneValidationRegex = /\d{3}-\d{3}-\d{4}/;
+
 const Kindergartedn = sequelize.define('kindergarten', {
     id: {
         type: Sequelize.BIGINT.UNSIGNED,
@@ -22,8 +24,20 @@ const Kindergartedn = sequelize.define('kindergarten', {
     }, longitude: {
         type: Sequelize.DECIMAL(11,2),
         allowNull: false,
+    }, email :{
+        type: Sequelize.STRING,
+        field: 'email',
+        unique: true
+    }, phone: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        trim: true,
+        validate: {
+            validator: function(v) {
+                return phoneValidationRegex.test(v); 
+            },
+        }
     }
-
 }, {
     freezeTableName: true,
     timestamps: false,

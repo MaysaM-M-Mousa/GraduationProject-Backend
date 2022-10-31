@@ -197,7 +197,7 @@ exports.getAllKindergartens = async (req, res) => {
 
 exports.updateKindergartenById = async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'locationFormatted', 'latitude', 'longitude']
+    const allowedUpdates = ['name', 'locationFormatted', 'latitude', 'longitude', 'email', 'phone']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -222,5 +222,17 @@ exports.updateKindergartenById = async (req, res) => {
     } catch (e) {
         console.log(e)
         res.status(400).send(e)
+    }
+}
+
+exports.deleteKindergartenById = async (req, res) =>{
+    try{
+        const result = await Kindergarten.destroy({ where: { id: req.params.id } })
+        if(!result){
+            return res.status(404).send()    
+        }
+        res.status(200).send()
+    }catch(e){
+        res.status(500).send()
     }
 }

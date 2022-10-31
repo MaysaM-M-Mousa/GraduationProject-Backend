@@ -35,6 +35,10 @@ const User = sequelize.define('user', {
         validate: {
             isDate: true
         }
+    }, phone : {
+        type: Sequelize.STRING,
+        allowNull: false,
+        trim: true,
     }
 }, {
     freezeTableName: true,
