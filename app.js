@@ -10,6 +10,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var kindergartensRouter = require('./routes/kindergartens');
 
 const options = {
 	definition: {
@@ -39,6 +40,7 @@ app.use(cookieParser());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/kindergartens', kindergartensRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -15,8 +15,8 @@ Role.hasMany(User, { onDelete: 'cascade' });
 User.belongsTo(Role, { foreignKey: "roleId" });
 
 // 3. many to many relationship between `User` and `Kindergarten` tables
-User.belongsToMany(Kindergarted, { through: User_Kindergarten, onDelete: 'cascade' });
-Kindergarted.belongsToMany(User, { through: User_Kindergarten, onDelete: 'cascade' });
+User.belongsToMany(Kindergarten, { through: User_Kindergarten, onDelete: 'cascade' });
+Kindergarten.belongsToMany(User, { through: User_Kindergarten, onDelete: 'cascade' });
 
 // create explicitly table if they are not exist
 const syncModels = async () => {
