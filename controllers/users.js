@@ -1,4 +1,5 @@
 const { User, Token } = require('../models/associations')
+const { ROLES } = require('../models/role')
 
 /**
  * @swagger
@@ -52,6 +53,9 @@ const { User, Token } = require('../models/associations')
 */
 
 exports.createUser = async (req, res) => {
+    req.body.roleId = (req.body.isKindergartenOwner === true) ? ROLES.KindergartenOwner : ROLES.Parent 
+    delete req.body.isKindergartenOwner
+    
     const user = new User(req.body)
 
     try {

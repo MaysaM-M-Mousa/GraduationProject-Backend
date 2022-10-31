@@ -48,7 +48,7 @@ const User = sequelize.define('user', {
             user.email = user.email.toLowerCase()
             user.dataValues.id = null
             user.password = await bcrypt.hash(user.password, 8)
-            user.roleId = (user.roleId == ROLES.Parent || user.roleId == ROLES.KindergartenOwner) ? user.roleId : ROLES.Parent
+            console.log("flag " + user.roleId)
         },
         beforeUpdate: async function (user) {
             if (user.changed('password')) {
