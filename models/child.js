@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize')
 const sequelize = require('../db/mysql')
+const { CHILD_STATUS } = require('./childstatus')
 
 const Child = sequelize.define('child', {
     id: {
@@ -38,6 +39,7 @@ const Child = sequelize.define('child', {
     hooks: {
         beforeCreate: async function (child) {
             child.dataValues.id = null
+            child.childStatusId = CHILD_STATUS.LookingForKindergarten
         }
     }
 })

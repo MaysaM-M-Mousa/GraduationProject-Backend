@@ -4,6 +4,7 @@ const { Role } = require('./role')
 const Kindergarten = require('./kindergarten')
 const User_Kindergarten = require('./user_kindergarten')
 const Child = require('./child')
+const { ChildStatus } = require('./childstatus')
 
 // 1. one to many relationship between `User` and `Token` tables
 User.hasMany(Token, { onDelete: 'cascade' })
@@ -21,14 +22,22 @@ Kindergarten.belongsToMany(User, { through: User_Kindergarten, onDelete: 'cascad
 User.hasMany(Child, { onDelete: 'cascade' });
 Child.belongsTo(User, { foreignKey: "userId" });
 
+// 5. one to many relationship between `Child` and `ChildStatus` tables
+ChildStatus.hasMany(Child);
+Child.belongsTo(ChildStatus, { foreignKey: "childStatusId" });
+
+// 6. one to many relationship between `Child` and `Kindergarten` tables
+Kindergarten.hasMany(Child, { onDelete: 'cascade' });
+Child.belongsTo(Kindergarten, { foreignKey: "kindergartenId" });
 
 // create explicitly table if they are not exist
-(async  () => {
+(async () => {
     await Role.sync()
     await User.sync()
     await Token.sync()
     await Kindergarten.sync()
     await User_Kindergarten.sync()
+    await ChildStatus.sync()
     await Child.sync()
 
     // await Role.bulkCreate([
@@ -36,8 +45,14 @@ Child.belongsTo(User, { foreignKey: "userId" });
     //     { roleName: "KindergartenOwner" },
     //     { roleName: "Admin" }
     // ])
+
+    // await ChildStatus.bulkCreate([
+    //     { statusName: "LookingForKindergarten" },
+    //     { statusName: "Enrolled" },
+    //     { statusName: "Graduated" }
+    // ])
 })();
 
 module.exports = {
-    User, Token, Role, Kindergarten, User_Kindergarten, Child
+    User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus
 }
