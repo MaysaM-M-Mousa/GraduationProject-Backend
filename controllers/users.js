@@ -53,9 +53,9 @@ const { ROLES } = require('../models/role')
 */
 
 exports.createUser = async (req, res) => {
-    req.body.roleId = (req.body.isKindergartenOwner === true) ? ROLES.KindergartenOwner : ROLES.Parent 
+    req.body.roleId = (req.body.isKindergartenOwner === true) ? ROLES.KindergartenOwner : ROLES.Parent
     delete req.body.isKindergartenOwner
-    
+
     const user = new User(req.body)
 
     try {
@@ -128,7 +128,7 @@ exports.loginUser = async (req, res) => {
         const token = await user.generateAuthToken()
         res.send({ user, token })
     } catch (e) {
-        res.status(400).send('Incorrect password or email user!')
+        res.status(401).send({ msg: 'Incorrect password or email user!' })
     }
 }
 
