@@ -35,7 +35,15 @@ const User = sequelize.define('user', {
         validate: {
             isDate: true
         }
-    }, phone : {
+    }, phone: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        trim: true,
+    }, country: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        trim: true,
+    }, city: {
         type: Sequelize.STRING,
         allowNull: false,
         trim: true,

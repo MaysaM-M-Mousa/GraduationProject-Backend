@@ -37,6 +37,14 @@ const Kindergartedn = sequelize.define('kindergarten', {
                 return phoneValidationRegex.test(v); 
             },
         }
+    }, country:{
+        type: Sequelize.STRING,
+        allowNull: false,
+        trim: true,
+    }, city: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        trim: true,
     }
 }, {
     freezeTableName: true,

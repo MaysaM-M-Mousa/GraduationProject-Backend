@@ -1,6 +1,6 @@
 const { commandOptions } = require('redis')
-const Kindergarten = require('../models/kindergarten')
-const User_Kindergarten = require('../models/user_kindergarten')
+const {Kindergarten} = require('../models/associations')
+const {User_Kindergarten} = require('../models/associations')
 
 /**
  * @swagger
