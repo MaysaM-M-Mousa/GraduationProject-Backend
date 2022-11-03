@@ -1,4 +1,4 @@
-const { User, Child } = require('../models/associations')
+const { User, Child, ChildStatus } = require('../models/associations')
 
 exports.createChild = async (req, res) => {
 
@@ -32,6 +32,10 @@ exports.getChild = async (req, res) => {
 
         if (req.query.includeParent === "true") {
             includedTables.push(User)
+        }
+
+        if (req.query.includeChildStatus === "true") {
+            includedTables.push(ChildStatus)
         }
 
         const child = await Child.findOne({ where: { id: req.params.id, userId: req.user.id }, include: includedTables })

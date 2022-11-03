@@ -1,5 +1,5 @@
-const { User, Token } = require('../models/associations')
-const { ROLES } = require('../models/role')
+const { User, Token, Child, ChildStatus } = require('../models/associations')
+const { ROLES, Role } = require('../models/role')
 
 /**
  * @swagger
@@ -186,7 +186,24 @@ exports.logoutAllUser = async (req, res) => {
  */
 
 exports.getMe = async (req, res) => {
-    res.send(req.user)
+    includedTables = []
+    nestedIncludedTables = []
+    if (req.query.includeChildren === "true") {
+        arr = []
+        if (req.query.includeChildrenStatus === "true") {
+            arr.push(ChildStatus)
+        }
+        includedTables.push({ model: Child, include: arr })
+    }
+
+    if (req.query.includeRole === "true") {
+        includedTables.push(Role)
+    }
+
+    const user = (includedTables.length > 0) ?
+        await User.findOne({ where: { id: req.user.id }, include: includedTables }) : req.user
+
+    res.status(200).send(user)
 }
 
 /**
