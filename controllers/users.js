@@ -63,7 +63,7 @@ exports.createUser = async (req, res) => {
 
         const token = await user.generateAuthToken()
 
-        res.status(201).send({ user, token })
+        res.status(201).send({ user, token, authStatus: user.roleId })
 
     } catch (e) {
         res.status(400).send(e)
@@ -126,7 +126,7 @@ exports.loginUser = async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
-        res.send({ user, token })
+        res.send({ user, token, authStatus: user.roleId })
     } catch (e) {
         res.status(401).send({ msg: 'Incorrect password or email user!' })
     }
