@@ -5,6 +5,7 @@ const Kindergarten = require('./kindergarten')
 const User_Kindergarten = require('./user_kindergarten')
 const Child = require('./child')
 const { ChildStatus } = require('./childstatus')
+const Audit = require('./audit')
 
 // 1. one to many relationship between `User` and `Token` tables
 User.hasMany(Token, { onDelete: 'cascade' })
@@ -39,6 +40,7 @@ Child.belongsTo(Kindergarten, { foreignKey: "kindergartenId" });
     await User_Kindergarten.sync()
     await ChildStatus.sync()
     await Child.sync()
+    await Audit.sync()
 
     // await Role.bulkCreate([
     //     { roleName: "Parent" },
@@ -54,5 +56,5 @@ Child.belongsTo(Kindergarten, { foreignKey: "kindergartenId" });
 })();
 
 module.exports = {
-    User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus
+    User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus, Audit
 }
