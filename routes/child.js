@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.post("/", auth, verifyRoles(ROLES.Parent), childController.createChild)
 router.get("/me", auth, verifyRoles(ROLES.Parent), childController.getMyChildren)
-router.get("/:id", auth, verifyRoles(ROLES.Parent), childController.getChild)
+router.get("/:id", auth, verifyRoles(ROLES.Parent, ROLES.KindergartenOwner), childController.getChild)
 router.patch("/:id", auth, verifyRoles(ROLES.Parent), childController.updateChild)
 router.delete("/:id", auth, verifyRoles(ROLES.Parent), childController.deleteChild)
 

@@ -1,4 +1,5 @@
-const { User, Child, ChildStatus } = require('../models/associations')
+const { User, Child, ChildStatus, RegisterApplication } = require('../models/associations')
+const { ROLES } = require('../models/role')
 const getImagesUtil = require('../utilities/getImagesUtil')
 
 exports.createChild = async (req, res) => {
@@ -46,7 +47,14 @@ exports.getChild = async (req, res) => {
             includedTables.push(ChildStatus)
         }
 
-        const child = await Child.findOne({ where: { id: req.params.id, userId: req.user.id }, include: includedTables })
+        if (req.query.includeRegisterApplications === "true" && req.user.roleId == ROLES.Parent) {
+            includedTables.push(RegisterApplication)
+        }
+
+        const child = await Child.findOne({
+            where: (req.user.roleId == ROLES.KindergartenOwner) ?
+                { id: req.params.id } : { id: req.params.id, userId: req.user.id }, include: includedTables
+        })
 
         if (!child) {
             return res.status(404).send()
