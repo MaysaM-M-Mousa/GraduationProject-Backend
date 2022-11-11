@@ -1,5 +1,6 @@
 const { User, Token, Child, ChildStatus } = require('../models/associations')
 const { ROLES, Role } = require('../models/role')
+const getImagesUtil = require('../utilities/getImagesUtil')
 
 /**
  * @swagger
@@ -126,6 +127,10 @@ exports.loginUser = async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
+
+        const result = await getImagesUtil(user.id, "user")
+        user.dataValues.imgs = result.length == 0 ? result : result.data.imgs
+
         res.send({ user, token, authStatus: user.roleId })
     } catch (e) {
         res.status(401).send({ msg: 'Incorrect password or email user!' })
@@ -202,6 +207,9 @@ exports.getMe = async (req, res) => {
 
     const user = (includedTables.length > 0) ?
         await User.findOne({ where: { id: req.user.id }, include: includedTables }) : req.user
+
+    const result = await getImagesUtil(user.id, "user")
+    user.dataValues.imgs = result.length == 0 ? result : result.data.imgs
 
     res.status(200).send(user)
 }

@@ -1,4 +1,5 @@
 const { User, Child, ChildStatus } = require('../models/associations')
+const getImagesUtil = require('../utilities/getImagesUtil')
 
 exports.createChild = async (req, res) => {
 
@@ -20,8 +21,15 @@ exports.getMyChildren = async (req, res) => {
     try {
         const children = await Child.findAll({ where: { userId: req.user.id } })
 
+        for (var i = 0; i < children.length; i++) {
+            const result = await getImagesUtil(children[i].dataValues.id, "child")
+            children[i].dataValues.imgs = result.length == 0 &&
+                result.length != undefined ? result : result.data.imgs
+        }
+
         return res.status(200).send(children)
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 }
@@ -47,6 +55,9 @@ exports.getChild = async (req, res) => {
         if (req.query.includeParent === "true") {
             delete child.user.dataValues.password
         }
+
+        const result = await getImagesUtil(child.id, "child")
+        child.dataValues.imgs = result.length == 0 ? result : result.data.imgs
 
         return res.status(200).send(child)
     } catch (e) {
