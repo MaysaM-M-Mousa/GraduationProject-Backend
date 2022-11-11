@@ -13,6 +13,7 @@ var usersRouter = require('./routes/users');
 var kindergartensRouter = require('./routes/kindergartens');
 var childRouter = require('./routes/child')
 var fileRouter = require("./routes/file")
+var RegisterApplicationRouter = require("./routes/registerapplication")
 
 const options = {
 	definition: {
@@ -46,6 +47,7 @@ app.use('/kindergartens', kindergartensRouter);
 app.use('/children', childRouter)
 app.use('/files', fileRouter)
 app.use('/uploads', express.static('./uploads'));
+app.use("/RegisterApplication", RegisterApplicationRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
