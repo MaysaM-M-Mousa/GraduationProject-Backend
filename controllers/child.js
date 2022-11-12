@@ -20,7 +20,13 @@ exports.createChild = async (req, res) => {
 
 exports.getMyChildren = async (req, res) => {
     try {
-        const children = await Child.findAll({ where: { userId: req.user.id } })
+        var includedTables = []
+
+        if (req.query.includeRegisterApplications === "true") {
+            includedTables.push(RegisterApplication)
+        }
+
+        const children = await Child.findAll({ where: { userId: req.user.id }, include: includedTables })
 
         for (var i = 0; i < children.length; i++) {
             const result = await getImagesUtil(children[i].dataValues.id, "child")
