@@ -48,6 +48,10 @@ exports.getImage = async (req, res) => {
         imgs = []
         imagesResult.forEach(e => imgs.push("/" + e.path.replace("\\", "/")))
 
+        if (FILE_BELONGS_TO[req.params.belongsTo] == 1 || FILE_BELONGS_TO[req.params.belongsTo] == 2) {
+            imgs = [imgs.at(-1)]
+        }
+
         res.status(200).send({ imgs })
 
     } catch (e) {
