@@ -1,4 +1,4 @@
-const { User, Child, ChildStatus, RegisterApplication } = require('../models/associations')
+const { User, Child, ChildStatus, RegisterApplication, REGISTER_APPLICATION_STATUS } = require('../models/associations')
 const Kindergartedn = require('../models/kindergarten')
 const { ROLES } = require('../models/role')
 const getImagesUtil = require('../utilities/getImagesUtil')
@@ -24,7 +24,9 @@ exports.getMyChildren = async (req, res) => {
         var includedTables = []
 
         if (req.query.includeRegisterApplications === "true") {
-            includedTables.push(RegisterApplication)
+            const appstatus = req.query.applicationStatus
+            includedTables.push((appstatus > 0 && appstatus <= 3) ?
+                { model: RegisterApplication, where: { application_status: appstatus }, required: false } : RegisterApplication)
         }
 
         if (req.query.includeKindergarten === "true") {
@@ -59,7 +61,9 @@ exports.getChild = async (req, res) => {
         }
 
         if (req.query.includeRegisterApplications === "true" && req.user.roleId == ROLES.Parent) {
-            includedTables.push(RegisterApplication)
+            const appstatus = req.query.applicationStatus
+            includedTables.push((appstatus > 0 && appstatus <= 3) ?
+                { model: RegisterApplication, where: { application_status: appstatus }, required: false } : RegisterApplication)
         }
 
         if (req.query.includeKindergarten === "true") {

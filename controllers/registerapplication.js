@@ -68,7 +68,7 @@ exports.getRegisterApplicationById = async (req, res) => {
     }
 }
 
-exports.getAllRegisterApplication = async (req, res) => {
+exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
     const MAX_PAGE_SIZE = 10
 
     const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
@@ -86,10 +86,9 @@ exports.getAllRegisterApplication = async (req, res) => {
             req.query.includeKindergarten)
 
 
-        var filter = {}
-        if (req.query.applicationStatus == REGISTER_APPLICATION_STATUS.APPROVED ||
-            req.query.applicationStatus == REGISTER_APPLICATION_STATUS.UNDER_REVIEW) {
-            filter = { application_status: req.query.applicationStatus }
+        var filter = { kindergartenId: req.params.id }
+        if (req.query.applicationStatus > 0 && req.query.applicationStatus <= 3) {
+            filter["application_status"] = req.query.applicationStatus
         }
 
         const apps = await RegisterApplication.findAndCountAll({
