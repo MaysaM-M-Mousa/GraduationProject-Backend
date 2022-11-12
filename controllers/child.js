@@ -1,4 +1,5 @@
 const { User, Child, ChildStatus, RegisterApplication } = require('../models/associations')
+const Kindergartedn = require('../models/kindergarten')
 const { ROLES } = require('../models/role')
 const getImagesUtil = require('../utilities/getImagesUtil')
 
@@ -24,6 +25,10 @@ exports.getMyChildren = async (req, res) => {
 
         if (req.query.includeRegisterApplications === "true") {
             includedTables.push(RegisterApplication)
+        }
+
+        if (req.query.includeKindergarten === "true") {
+            includedTables.push(Kindergartedn)
         }
 
         const children = await Child.findAll({ where: { userId: req.user.id }, include: includedTables })
@@ -55,6 +60,10 @@ exports.getChild = async (req, res) => {
 
         if (req.query.includeRegisterApplications === "true" && req.user.roleId == ROLES.Parent) {
             includedTables.push(RegisterApplication)
+        }
+
+        if (req.query.includeKindergarten === "true") {
+            includedTables.push(Kindergartedn)
         }
 
         const child = await Child.findOne({
