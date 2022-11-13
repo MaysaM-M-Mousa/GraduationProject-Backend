@@ -58,10 +58,19 @@ exports.getImage = async (req, res) => {
     }
 }
 
-exports.deleteImage = async (req, res) => {
+exports.deleteFile = async (req, res) => {
     try {
 
-        const result = await File.findAll({ where: { rowId: req.params.rowId, belongsTo: FILE_BELONGS_TO[req.params.belongsTo] } })
+        if (FILE_TYPES[req.params.type] == undefined) {
+            return res.status(404).send()
+        }
+
+        const result = await File.findAll({
+            where: {
+                rowId: req.params.rowId,
+                belongsTo: FILE_BELONGS_TO[req.params.belongsTo], type: FILE_TYPES[req.params.type]
+            }
+        })
 
         if (result.length == 0) {
             return res.status(404).send()
@@ -74,6 +83,47 @@ exports.deleteImage = async (req, res) => {
         })
 
         res.status(200).send()
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.uploadDocument = async (req, res) => {
+    try {
+        const file = new File({
+            path: path.join(req.file.destination, req.file.filename),
+            Type: FILE_TYPES["document"],
+            belongsTo: FILE_BELONGS_TO[req.params.belongsTo],
+            rowId: req.params.rowId
+        })
+
+        await file.save()
+
+        return res.status(200).send({ document: "/" + file.dataValues.path.replace("\\", "/") })
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.getDocument = async (req, res) => {
+    try {
+        const filter = {
+            Type: FILE_TYPES["document"],
+            belongsTo: FILE_BELONGS_TO[req.params.belongsTo],
+            rowId: req.params.rowId
+        }
+
+        const docsResult = await File.findAll({ where: filter })
+
+        if (!docsResult || docsResult.length == 0) {
+            return res.status(404).send()
+        }
+
+        documents = []
+        docsResult.forEach(e => documents.push("/" + e.path.replace("\\", "/")))
+
+        res.status(200).send({ documents })
+
     } catch (e) {
         res.status(500).send()
     }

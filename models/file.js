@@ -38,7 +38,8 @@ FILE_TYPES = {
 FILE_BELONGS_TO = {
     "user": 1,
     "child": 2,
-    "kindergarten": 3
+    "kindergarten": 3,
+    "RegisterApplication": 4
 }
 
 module.exports = { File, FILE_TYPES, FILE_BELONGS_TO }
