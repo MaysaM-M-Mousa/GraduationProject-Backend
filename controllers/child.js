@@ -43,7 +43,6 @@ exports.getMyChildren = async (req, res) => {
 
         return res.status(200).send(children)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }
@@ -88,7 +87,6 @@ exports.getChild = async (req, res) => {
 
         return res.status(200).send(child)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }
@@ -114,7 +112,7 @@ exports.updateChild = async (req, res) => {
 
         res.send(child)
     } catch (e) {
-
+        res.status(500).send()
     }
 }
 

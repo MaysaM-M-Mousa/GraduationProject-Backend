@@ -24,9 +24,8 @@ exports.uploadImage = async (req, res) => {
 
         await file.save()
 
-        return res.status(200).send()
+        return res.status(200).send({ imgs: "/" + file.dataValues.path.replace("\\", "/") })
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }

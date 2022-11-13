@@ -63,7 +63,6 @@ exports.getRegisterApplicationById = async (req, res) => {
         res.status(200).send(RegApp)
 
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }
@@ -100,7 +99,6 @@ exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
 
         res.status(200).send(apps)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }

@@ -9,7 +9,7 @@ const router = express.Router()
 router.post("/", auth, verifyRoles(ROLES.KindergartenOwner), kindergartenController.createKindergarten)
 router.get("/", kindergartenController.getAllKindergartens)
 router.get("/:id", kindergartenController.getKindergartenByPK)
-router.patch("/:id", auth, kindergartenController.updateKindergartenById)
+router.patch("/:id", auth, verifyRoles(ROLES.KindergartenOwner), kindergartenController.updateKindergartenById)
 router.delete("/:id", auth, verifyRoles(ROLES.Admin), kindergartenController.deleteKindergartenById)
 
 module.exports = router

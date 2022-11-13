@@ -172,7 +172,6 @@ exports.getAllKindergartens = async (req, res) => {
 
         res.status(200).send(kindergartens)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }
@@ -232,7 +231,6 @@ exports.updateKindergartenById = async (req, res) => {
 
         res.send(kindergarten)
     } catch (e) {
-        console.log(e)
         res.status(400).send(e)
     }
 }
