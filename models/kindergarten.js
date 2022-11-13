@@ -45,6 +45,12 @@ const Kindergartedn = sequelize.define('kindergarten', {
         type: Sequelize.STRING,
         allowNull: false,
         trim: true,
+    }, URL:{
+        type: Sequelize.STRING,
+        field: 'url',
+        allowNull: true,
+        trim: true,
+        validate: { isURL: true }
     }
 }, {
     freezeTableName: true,
