@@ -19,33 +19,38 @@ const Kindergartedn = sequelize.define('kindergarten', {
         field: 'location_formatted',
         allowNull: false
     }, latitude: {
-        type: Sequelize.DECIMAL(11,2),
+        type: Sequelize.DECIMAL(11, 2),
+        field: 'latitude',
         allowNull: false,
     }, longitude: {
-        type: Sequelize.DECIMAL(11,2),
+        type: Sequelize.DECIMAL(11, 2),
+        field: 'longitude',
         allowNull: false,
-    }, email :{
+    }, email: {
         type: Sequelize.STRING,
         field: 'email',
         unique: true
     }, phone: {
         type: Sequelize.STRING,
+        field: 'phone',
         allowNull: false,
         trim: true,
         validate: {
-            validator: function(v) {
-                return phoneValidationRegex.test(v); 
+            validator: function (v) {
+                return phoneValidationRegex.test(v);
             },
         }
-    }, country:{
+    }, country: {
         type: Sequelize.STRING,
+        field: 'country',
         allowNull: false,
         trim: true,
     }, city: {
         type: Sequelize.STRING,
+        field: 'city',
         allowNull: false,
         trim: true,
-    }, URL:{
+    }, URL: {
         type: Sequelize.STRING,
         field: 'url',
         allowNull: true,

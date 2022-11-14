@@ -6,23 +6,23 @@ const Audit = sequelize.define('audit', {
         type: Sequelize.BIGINT.UNSIGNED,
         autoIncrement: true,
         primaryKey: true
-    }, TableName: {
+    }, tableName: {
         type: Sequelize.STRING,
         field: 'table_name',
         allowNull: false,
-    }, ColumnName: {
+    }, columnName: {
         type: Sequelize.STRING,
         field: 'column_name',
         allowNull: false,
-    }, RowId: {
+    }, rowId: {
         type: Sequelize.BIGINT.UNSIGNED,
         field: 'rowId',
         allowNull: false,
-    }, OldValue: {
+    }, oldValue: {
         type: Sequelize.STRING(4096),
         field: 'old_value',
         allowNull: false,
-    }, NewValue: {
+    }, newValue: {
         type: Sequelize.STRING(4096),
         field: 'new_value',
         allowNull: false,
@@ -30,12 +30,11 @@ const Audit = sequelize.define('audit', {
         type: Sequelize.BIGINT.UNSIGNED,
         field: 'userId',
         allowNull: false,
-    }, UpdatedAt: {
+    }, updatedAt: {
         type: Sequelize.DATEONLY,
         field: 'updatedAt',
         allowNull: false,
     }
-
 }, {
     freezeTableName: true,
     timestamps: false,

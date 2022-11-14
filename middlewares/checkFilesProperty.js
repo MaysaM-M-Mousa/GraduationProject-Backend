@@ -10,7 +10,7 @@ const checking = async (req, res, next) => {
 
     if (
         (req.params.belongsTo == "kindergarten" && role != ROLES.KindergartenOwner) ||
-        (req.params.belongsTo == "child" && role != ROLES.Parent) || 
+        (req.params.belongsTo == "child" && role != ROLES.Parent) ||
         (req.params.belongsTo == "RegisterApplication" && role != ROLES.Parent)) {
         return res.status(401).send()
     }

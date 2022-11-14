@@ -22,8 +22,6 @@
     "nodemon": "^2.0.19",
     "redis": "^4.3.1",
     "sequelize": "^6.21.6",
-    "sharp": "^0.31.2",
-    "swagger-jsdoc": "^6.2.5",
-    "swagger-ui-express": "^4.5.0"
+    "sharp": "^0.31.2"
   }
 }
