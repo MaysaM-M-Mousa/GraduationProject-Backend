@@ -75,10 +75,10 @@ exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
 
     try {
 
-        const result = await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: req.params.kindergartenId } })
+        const result = await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: req.params.id } })
 
         if (!result) {
-            return res.status(401).send({ msg: "This kindergarten does not belog to you" })
+            return res.status(401).send({ msg: "This kindergarten does not belong to you" })
         }
 
         const includedTables = getIncludedTablesForRegApp(req.query.includeChild, req.query.includeParent,
