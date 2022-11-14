@@ -1,4 +1,4 @@
-const { Kindergarten } = require('../models/associations')
+const { Kindergarten, User } = require('../models/associations')
 const { User_Kindergarten } = require('../models/associations')
 const getImagesUtil = require('../utilities/getImagesUtil')
 
@@ -91,6 +91,28 @@ exports.updateKindergartenById = async (req, res) => {
         res.send(kindergarten)
     } catch (e) {
         res.status(400).send(e)
+    }
+}
+
+exports.getAllOwnersKindergartens = async (req, res) => {
+    try {
+        const user = await User.findOne({ where: { id: req.user.id }, include: Kindergarten })
+
+        if (!user) {
+            return res.status(404).send()
+        }
+
+        if (req.query.includeImages === "true") {
+            for (var i = 0; i < user.kindergartens.length; i++) {
+                const result = await getImagesUtil(user.kindergartens[i].dataValues.id, "kindergarten")
+                user.kindergartens[i].dataValues.imgs = result.length == 0 &&
+                    result.length != undefined ? result : result.data.imgs
+            }
+        }
+
+        res.status(200).send({ kindergartens: user.kindergartens })
+    } catch (e) {
+        res.status(500).send()
     }
 }
 
