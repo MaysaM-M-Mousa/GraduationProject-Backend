@@ -105,33 +105,37 @@ exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
 
 exports.updateRegApp = async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['childId']
+    const allowedUpdates = ['applicationStatus']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
         return res.status(400).send({ 'error': 'Invalid updates!' })
     }
 
-    try {
-        const app = await RegisterApplication.findOne({ where: { id: req.params.id } })
+    if (!Object.values(REGISTER_APPLICATION_STATUS).includes(req.body['applicationStatus'])) {
+        return res.status(400).send({ msg: "undefined applicationStatus!" })
+    }
 
-        if (app == null) {
+    try {
+        const app = await RegisterApplication.findOne({
+            attributes: ['id', 'ApplicationStatus', 'createdAt', 'childId', 'kindergartenId'],
+            where: { id: req.params.id },
+            include: { model: Kindergarten, required: true, include: { model: User, where: { id: req.user.id }, required: true, } }
+        })
+
+        if (!app) {
             return res.status(404).send()
         }
 
-        const child = await Child.findOne({ where: { id: req.body['childId'], userId: req.user.id } })
-
-        if (!child) {
-            return res.status(404).send("s")
-        }
-
-        app.childId = req.body['childId']
+        app.ApplicationStatus = req.body['applicationStatus']
 
         await app.save()
 
-        res.send(app)
+        delete app.dataValues.kindergarten
+
+        return res.status(200).send(app)
     } catch (e) {
-        res.status(404).send()
+        res.status(500).send()
     }
 }
 
