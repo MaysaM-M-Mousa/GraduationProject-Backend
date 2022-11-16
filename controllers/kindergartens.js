@@ -110,7 +110,7 @@ exports.getAllOwnersKindergartens = async (req, res) => {
             }
         }
 
-        res.status(200).send({ kindergartens: user.kindergartens })
+        res.status(200).send({ rows: user.kindergartens })
     } catch (e) {
         res.status(500).send()
     }
