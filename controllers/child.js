@@ -10,7 +10,7 @@ exports.createChild = async (req, res) => {
     try {
         child.userId = req.user.id
 
-        await child.save()
+        await child.save({ id: req.user.id })
 
         res.status(201).send(child)
 
@@ -108,7 +108,7 @@ exports.updateChild = async (req, res) => {
         }
 
         updates.forEach((update) => child[update] = req.body[update])
-        await child.save()
+        await child.save({ id: req.user.id })
 
         res.send(child)
     } catch (e) {
@@ -118,12 +118,13 @@ exports.updateChild = async (req, res) => {
 
 exports.deleteChild = async (req, res) => {
     try {
-        const result = await Child.destroy({ where: { id: req.params.id, userId: req.user.id } })
+        const result = await Child.destroy({ where: { id: req.params.id, userId: req.user.id }, individualHooks: true, id: req.user.id })
         if (!result) {
             return res.status(404).send()
         }
         res.status(200).send()
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 }
