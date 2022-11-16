@@ -5,9 +5,10 @@ const Kindergarten = require('./kindergarten')
 const User_Kindergarten = require('./user_kindergarten')
 const Child = require('./child')
 const { ChildStatus } = require('./childstatus')
-const Audit = require('./audit')
+const { Audit, AUDIT_ACTIONS } = require('./audit')
 const { File, FILE_BELONGS_TO, FILE_TYPES } = require("./file")
 const { RegisterApplication, REGISTER_APPLICATION_STATUS } = require('./registerapplicaton')
+const registerModelsToAudit = require('../utilities/auditService')
 
 // 1. one to many relationship between `User` and `Token` tables
 User.hasMany(Token, { onDelete: 'cascade' })
@@ -64,9 +65,16 @@ RegisterApplication.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allo
     //     { statusName: "Enrolled" },
     //     { statusName: "Graduated" }
     // ])
+
+    /*
+    To register a new model:
+        1. append the model as the last parameter to registerModelsToAudit() function
+        2. add { id : req.user.id } to the save() and destroy() methods in the controller corresponding to that model
+    */
+    registerModelsToAudit(Audit, Child)
 })();
 
 module.exports = {
     User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus, Audit, File, FILE_BELONGS_TO,
-    FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS
+    FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS, AUDIT_ACTIONS
 }
