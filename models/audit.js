@@ -1,6 +1,12 @@
 const Sequelize = require('sequelize')
 const sequelize = require('../db/mysql')
 
+const AUDIT_ACTIONS = {
+    CREATE: "create",
+    UPDATE: "update",
+    DELETE: "delete"
+}
+
 const Audit = sequelize.define('audit', {
     id: {
         type: Sequelize.BIGINT.UNSIGNED,
@@ -13,7 +19,7 @@ const Audit = sequelize.define('audit', {
     }, columnName: {
         type: Sequelize.STRING,
         field: 'column_name',
-        allowNull: false,
+        allowNull: true,
     }, rowId: {
         type: Sequelize.BIGINT.UNSIGNED,
         field: 'rowId',
@@ -21,25 +27,26 @@ const Audit = sequelize.define('audit', {
     }, oldValue: {
         type: Sequelize.STRING(4096),
         field: 'old_value',
-        allowNull: false,
+        allowNull: true,
     }, newValue: {
         type: Sequelize.STRING(4096),
         field: 'new_value',
-        allowNull: false,
+        allowNull: true,
     }, userId: {
         type: Sequelize.BIGINT.UNSIGNED,
         field: 'userId',
+        allowNull: false
+    }, action: {
+        type: Sequelize.STRING(32),
+        field: 'action',
         allowNull: false,
-    }, updatedAt: {
-        type: Sequelize.DATEONLY,
-        field: 'updatedAt',
-        allowNull: false,
+        validate: { isIn: { args: [Object.values(AUDIT_ACTIONS)], msg: 'Action must be create, update, or delete' } }
     }
 }, {
     freezeTableName: true,
-    timestamps: false,
-    createdAt: false,
+    timestamps: { type: Sequelize.DATE, allowNull: false },
+    createdAt: true,
     updatedAt: false
 })
 
-module.exports = Audit
+module.exports = { Audit, AUDIT_ACTIONS }
