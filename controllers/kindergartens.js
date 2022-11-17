@@ -7,7 +7,7 @@ exports.createKindergarten = async (req, res) => {
     const kindergarten = new Kindergarten(req.body)
 
     try {
-        await kindergarten.save()
+        await kindergarten.save({ id: req.user.id })
 
         const user_kindergarten = new User_Kindergarten({ userId: req.user.id, kindergartenId: kindergarten.id })
 
@@ -82,7 +82,7 @@ exports.updateKindergartenById = async (req, res) => {
         }
 
         updates.forEach((update) => kindergarten[update] = req.body[update])
-        await kindergarten.save()
+        await kindergarten.save({ id: req.user.id })
 
         if (!kindergarten) {
             res.status(404).send()
@@ -118,7 +118,7 @@ exports.getAllOwnersKindergartens = async (req, res) => {
 
 exports.deleteKindergartenById = async (req, res) => {
     try {
-        const result = await Kindergarten.destroy({ where: { id: req.params.id } })
+        const result = await Kindergarten.destroy({ where: { id: req.params.id }, individualHooks: true, id: req.user.id })
         if (!result) {
             return res.status(404).send()
         }

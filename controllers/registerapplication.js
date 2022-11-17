@@ -17,7 +17,7 @@ exports.createRegistrationApplication = async (req, res) => {
 
         app.ApplicationStatus = REGISTER_APPLICATION_STATUS.UNDER_REVIEW
 
-        await app.save()
+        await app.save({ id: req.user.id })
 
         res.status(201).send(app)
 
@@ -129,7 +129,7 @@ exports.updateRegApp = async (req, res) => {
 
         app.ApplicationStatus = req.body['applicationStatus']
 
-        await app.save()
+        await app.save({ id: req.user.id })
 
         delete app.dataValues.kindergarten
 
@@ -145,6 +145,9 @@ exports.deleteRegApp = async (req, res) => {
         const options = req.user.roleId == ROLES.KindergartenOwner ?
             { where: { id: req.params.id } } :
             { where: { id: req.params.id }, include: { model: User, where: { id: req.user.id } } }
+
+            options['individualHooks'] = true
+            options['id'] = req.user.id
 
         const result = await RegisterApplication.destroy(options)
 
