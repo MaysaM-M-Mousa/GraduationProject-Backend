@@ -89,7 +89,7 @@ exports.editMe = async (req, res) => {
     try {
         const user = req.user
         updates.forEach((update) => user[update] = req.body[update])
-        await user.save()
+        await user.save({ id: req.user.id })
 
         if (!user) {
             res.status(404).send()
@@ -102,7 +102,7 @@ exports.editMe = async (req, res) => {
 
 exports.deleteMe = async (req, res) => {
     try {
-        await User.destroy({ where: { id: req.user.id } })
+        await User.destroy({ where: { id: req.user.id }, individualHooks: true, id: req.user.id })
         res.send()
     } catch (e) {
         res.status(500).send()

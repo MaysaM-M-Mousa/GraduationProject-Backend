@@ -3,6 +3,8 @@ const { AUDIT_ACTIONS } = require("../models/audit")
 const auditRecord = (Audit, model, action, options) => {
 
     var result = []
+    const userId = (model.constructor.getTableName() === "user" && action === AUDIT_ACTIONS.CREATE) ? model.id : options.id
+    
     if (action == AUDIT_ACTIONS.UPDATE) {
         model._changed.forEach(x => result.push({
             columnName: x,
@@ -12,9 +14,9 @@ const auditRecord = (Audit, model, action, options) => {
 
         result.forEach(obj => {
             obj["rowId"] = model.get('id'),
-                obj["userId"] = options.id,
-                obj["action"] = action,
-                obj["tableName"] = model.constructor.getTableName()
+            obj["userId"] = userId,
+            obj["action"] = action,
+            obj["tableName"] = model.constructor.getTableName()
         })
     } else {
         result.push({
@@ -23,7 +25,7 @@ const auditRecord = (Audit, model, action, options) => {
             rowId: model.get('id'),
             oldValue: null,
             newValue: null,
-            userId: options.id,
+            userId: userId,
             action: action
         })
     }
