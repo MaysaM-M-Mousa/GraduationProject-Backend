@@ -77,6 +77,35 @@ exports.getMe = async (req, res) => {
     res.status(200).send(user)
 }
 
+exports.getAllUsers = async (req, res) => {
+    try {
+        const MAX_PAGE_SIZE = 10
+
+        const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
+        const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
+
+        var includedTables = []
+
+        if (req.query.includeChildren === "true") {
+            includedTables.push(Child)
+        }
+
+        if (req.query.includeRole === "true") {
+            includedTables.push(Role)
+        }
+
+        const users = await User.findAll({
+            include: includedTables,
+            offset: (pageNumber - 1) * pageSize,
+            limit: pageSize
+        })
+
+        res.status(200).send(users)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
 exports.editMe = async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['firstName', 'lastName', 'email', 'password', 'dateOfBirth']

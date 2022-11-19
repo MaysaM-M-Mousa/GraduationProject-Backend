@@ -9,6 +9,7 @@ router.post('/login', userController.loginUser)
 router.post('/logout', auth, userController.logoutUser)
 router.post('/logoutAll', auth, userController.logoutAllUser)
 router.get('/me', auth, userController.getMe)
+router.get('/All', auth, userController.getAllUsers)
 router.patch('/me', auth, userController.editMe)
 router.delete('/me', auth, userController.deleteMe)
 
