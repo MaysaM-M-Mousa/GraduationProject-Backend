@@ -1,3 +1,4 @@
+const { response } = require('express')
 const { User, Child, ChildStatus, RegisterApplication, REGISTER_APPLICATION_STATUS } = require('../models/associations')
 const Kindergartedn = require('../models/kindergarten')
 const { ROLES } = require('../models/role')
@@ -86,6 +87,46 @@ exports.getChild = async (req, res) => {
         child.dataValues.imgs = result.length == 0 ? result : result.data.imgs
 
         return res.status(200).send(child)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.getAllChildren = async (req, res) => {
+    try {
+
+        const MAX_PAGE_SIZE = 10
+
+        const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
+        const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
+
+        var includedTables = []
+
+        if (req.query.includeParent === "true") {
+            includedTables.push(User)
+        }
+
+        if (req.query.includeChildStatus === "true") {
+            includedTables.push(ChildStatus)
+        }
+
+        if (req.query.includeRegisterApplications === "true") {
+            const appstatus = req.query.applicationStatus
+            includedTables.push((appstatus > 0 && appstatus <= 3) ?
+                { model: RegisterApplication, where: { application_status: appstatus }, required: false } : RegisterApplication)
+        }
+
+        if (req.query.includeKindergarten === "true") {
+            includedTables.push(Kindergartedn)
+        }
+
+        const children = await Child.findAll({
+            include: includedTables,
+            offset: (pageNumber - 1) * pageSize,
+            limit: pageSize
+        })
+
+        res.status(200).send(children)
     } catch (e) {
         res.status(500).send()
     }
