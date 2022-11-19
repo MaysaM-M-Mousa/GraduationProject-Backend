@@ -94,7 +94,11 @@ exports.getAllUsers = async (req, res) => {
             includedTables.push(Role)
         }
 
+        const filter = req.query.role != undefined && Object.values(ROLES).includes(parseInt(req.query.role))
+            ? { roleId: req.query.role } : {}
+
         const users = await User.findAll({
+            where: filter,
             include: includedTables,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize
