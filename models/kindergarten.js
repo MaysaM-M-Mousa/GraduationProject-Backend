@@ -50,9 +50,9 @@ const Kindergartedn = sequelize.define('kindergarten', {
         field: 'city',
         allowNull: false,
         trim: true,
-    }, URL: {
+    }, website: {
         type: Sequelize.STRING,
-        field: 'url',
+        field: 'website',
         allowNull: true,
         trim: true,
         validate: { isURL: true }
