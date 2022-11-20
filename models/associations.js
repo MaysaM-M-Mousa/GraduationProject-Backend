@@ -89,7 +89,7 @@ Plan.belongsTo(Service, { foreignKey: "serviceId" });
         2. add { id : req.user.id } as a parameter any function in the controller that does one of the following [create, update, delete]
         3. for destroy() method in controllers, we must add "individualHooks: true" parameter to be fired on action 
     */
-    registerModelsToAudit(Audit, Child, RegisterApplication, Kindergarten, User, Review)
+    registerModelsToAudit(Audit, Child, RegisterApplication, Kindergarten, User, Review, Service)
 })();
 
 module.exports = {

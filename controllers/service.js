@@ -4,7 +4,7 @@ exports.createService = async (req, res) => {
     try {
         const service = new Service(req.body)
 
-        await service.save()
+        await service.save({ id: req.user.id })
 
         res.status(201).send(service)
     } catch (e) {
@@ -69,7 +69,7 @@ exports.updateService = async (req, res) => {
         }
 
         updates.forEach((update) => service[update] = req.body[update])
-        await service.save()
+        await service.save({ id: req.user.id })
 
         res.send(service)
 
@@ -80,7 +80,7 @@ exports.updateService = async (req, res) => {
 
 exports.deleteService = async (req, res) => {
     try {
-        const result = await Service.destroy({ where: { id: req.params.id } })
+        const result = await Service.destroy({ where: { id: req.params.id }, individualHooks: true, id: req.user.id })
 
         if (!result) {
             return res.status(404).send()
