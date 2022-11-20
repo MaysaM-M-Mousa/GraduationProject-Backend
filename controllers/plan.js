@@ -8,7 +8,7 @@ exports.createPlan = async (req, res) => {
 
         const plan = new Plan(req.body)
 
-        await plan.save()
+        await plan.save({ id: req.user.id })
 
         res.status(201).send(plan)
     } catch (e) {
@@ -71,7 +71,7 @@ exports.updatePlan = async (req, res) => {
         }
 
         updates.forEach((update) => plan[update] = req.body[update])
-        await plan.save()
+        await plan.save({ id: req.user.id })
 
         res.send(plan)
 
@@ -82,7 +82,7 @@ exports.updatePlan = async (req, res) => {
 
 exports.deletePlan = async (req, res) => {
     try {
-        const result = await Plan.destroy({ where: { id: req.params.id } })
+        const result = await Plan.destroy({ where: { id: req.params.id }, individualHooks: true, id: req.user.id })
 
         if (!result) {
             return res.status(404).send()

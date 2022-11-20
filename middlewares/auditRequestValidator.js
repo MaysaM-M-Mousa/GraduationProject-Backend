@@ -2,7 +2,7 @@ const { AUDIT_ACTIONS } = require("../models/associations")
 const { ROLES } = require("../models/role")
 
 const auditCheck = async (req, res, next) => {
-    const allowedEntities = ['user', 'kindergarten', 'register_application', 'child', 'service']
+    const allowedEntities = ['user', 'kindergarten', 'register_application', 'child', 'review', 'service', 'plan']
     const allowedOrderOptions = ['desc', 'asc']
 
     if (!allowedEntities.includes(req.params.entity)) {
