@@ -1,4 +1,4 @@
-const { Service } = require('../models/associations')
+const { Service, Plan } = require('../models/associations')
 
 exports.createService = async (req, res) => {
     try {
@@ -32,8 +32,15 @@ exports.getAllServices = async (req, res) => {
     const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
     const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
 
+    const includedTables = []
+
+    if (req.query.includePlans === "true") {
+        includedTables.push(Plan)
+    }
+
     try {
         const services = await Service.findAndCountAll({
+            include: includedTables,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
             distinct: true
