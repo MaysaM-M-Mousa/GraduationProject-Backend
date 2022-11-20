@@ -1,4 +1,4 @@
-const { Review } = require('../models/associations')
+const { Review, Kindergarten, User, ROLES } = require('../models/associations')
 
 exports.createReview = async (req, res) => {
     try {
@@ -22,6 +22,64 @@ exports.getReviewById = async (req, res) => {
         }
 
         res.status(200).send(review)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.getAllUserReviews = async (req, res) => {
+    const MAX_PAGE_SIZE = 10
+
+    const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
+    const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
+
+    var includedTables = []
+
+    if (req.query.includeKindergarten === "true") {
+        includedTables.push(Kindergarten)
+    }
+
+    try {
+        const reviews = await Review.findAndCountAll({
+            where: { userId: req.user.roleId == ROLES.Admin ? req.params.id : req.user.id },
+            include: includedTables,
+            offset: (pageNumber - 1) * pageSize,
+            limit: pageSize,
+            distinct: true
+        })
+
+        res.status(200).send(reviews)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.getAllKindergartenReviews = async (req, res) => {
+    const MAX_PAGE_SIZE = 10
+
+    const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
+    const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
+
+    var includedTables = []
+
+    if (req.query.includeParent === "true") {
+        includedTables.push(User)
+    }
+
+    try {
+        const reviews = await Review.findAndCountAll({
+            where: { kindergartenId: req.params.id },
+            include: includedTables,
+            offset: (pageNumber - 1) * pageSize,
+            limit: pageSize,
+            distinct: true
+        })
+
+        if (req.query.includeParent === "true") {
+            reviews.rows.forEach(r => delete r.user.dataValues.password)
+        }
+
+        res.status(200).send(reviews)
     } catch (e) {
         res.status(500).send()
     }
