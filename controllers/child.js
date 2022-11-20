@@ -120,10 +120,11 @@ exports.getAllChildren = async (req, res) => {
             includedTables.push(Kindergartedn)
         }
 
-        const children = await Child.findAll({
+        const children = await Child.findAndCountAll({
             include: includedTables,
             offset: (pageNumber - 1) * pageSize,
-            limit: pageSize
+            limit: pageSize,
+            distinct: true
         })
 
         res.status(200).send(children)

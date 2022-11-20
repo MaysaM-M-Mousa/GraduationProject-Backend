@@ -48,7 +48,8 @@ exports.getAllKindergartens = async (req, res) => {
     try {
         const kindergartens = await Kindergarten.findAndCountAll({
             offset: (pageNumber - 1) * pageSize,
-            limit: pageSize
+            limit: pageSize,
+            distinct: true
         })
 
         if (req.query.includeImages === "true") {

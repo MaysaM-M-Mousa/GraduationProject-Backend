@@ -97,11 +97,12 @@ exports.getAllUsers = async (req, res) => {
         const filter = req.query.role != undefined && Object.values(ROLES).includes(parseInt(req.query.role))
             ? { roleId: req.query.role } : {}
 
-        const users = await User.findAll({
+        const users = await User.findAndCountAll({
             where: filter,
             include: includedTables,
             offset: (pageNumber - 1) * pageSize,
-            limit: pageSize
+            limit: pageSize,
+            distinct: true
         })
 
         res.status(200).send(users)
