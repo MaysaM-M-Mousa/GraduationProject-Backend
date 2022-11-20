@@ -5,11 +5,11 @@ exports.createReview = async (req, res) => {
         req.body.userId = req.user.id
         const review = new Review(req.body)
 
-        await review.save()
+        await review.save({ id: req.user.id })
 
         res.status(201).send(review)
     } catch (e) {
-        res.status(500).send({ err: e.errors[0].message })
+        res.status(500).send(e)
     }
 }
 
@@ -113,7 +113,7 @@ exports.updateReview = async (req, res) => {
 
 exports.deleteReview = async (req, res) => {
     try {
-        const result = await Review.destroy({ where: { id: req.params.id, userId: req.user.id } })
+        const result = await Review.destroy({ where: { id: req.params.id, userId: req.user.id }, individualHooks: true, id: req.user.id })
 
         if (!result) {
             return res.status(404).send()

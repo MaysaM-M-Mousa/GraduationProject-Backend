@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const sequelize = require('../db/mysql')
 
 const Review = sequelize.define('review', {
-    Id: {
+    id: {
         type: Sequelize.BIGINT.UNSIGNED,
         autoIncrement: true,
         primaryKey: true
