@@ -13,6 +13,7 @@ var childRouter = require('./routes/child')
 var fileRouter = require("./routes/file")
 var RegisterApplicationRouter = require("./routes/registerapplication")
 var AuditRouter = require('./routes/audit')
+var ReviewRouter = require('./routes/review')
 
 var app = express();
 
@@ -30,6 +31,7 @@ app.use('/files', fileRouter);
 app.use('/uploads', express.static('./uploads'));
 app.use('/RegisterApplication', RegisterApplicationRouter);
 app.use('/audit', AuditRouter)
+app.use('/reviews', ReviewRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
