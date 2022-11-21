@@ -54,6 +54,16 @@ exports.getAllPlans = async (req, res) => {
     }
 }
 
+exports.getAllPlansForService = async (req, res) => {
+    try {
+        const plans = await Plan.findAll({ where: { serviceId: req.params.id } })
+
+        res.status(200).send(plans)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
 exports.updatePlan = async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'durationInMonths', 'price']
