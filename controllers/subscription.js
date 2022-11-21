@@ -32,7 +32,7 @@ exports.createSubscription = async (req, res) => {
         req.body.price = plan.price
 
         const subscription = new Subscription(req.body)
-        await subscription.save()
+        await subscription.save({ id: req.user.id })
 
         res.status(201).send(subscription)
     } catch (e) {
@@ -144,7 +144,7 @@ exports.deleteSubscription = async (req, res) => {
             return res.status(451).send({ msg: "You can cancel your subscription only 1 month after officially subscribing to a plan!" })
         }
 
-        await subscription.destroy()
+        await subscription.destroy({ individualHooks: true, id: req.user.id })
 
         res.status(200).send()
     } catch (e) {

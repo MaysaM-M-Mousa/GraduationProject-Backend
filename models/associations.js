@@ -97,8 +97,9 @@ Subscription.belongsTo(Plan, { foreignKey: "planId", allowNull: false });
         1. append the model as the last parameter to registerModelsToAudit() function
         2. add { id : req.user.id } as a parameter any function in the controller that does one of the following [create, update, delete]
         3. for destroy() method in controllers, we must add "individualHooks: true" parameter to be fired on action 
+        4. add the name of the table allowedEntites variable in the auditRequestValidator middleware
     */
-    registerModelsToAudit(Audit, Child, RegisterApplication, Kindergarten, User, Review, Service, Plan)
+    registerModelsToAudit(Audit, Child, RegisterApplication, Kindergarten, User, Review, Service, Plan, Subscription)
 })();
 
 module.exports = {
