@@ -12,6 +12,7 @@ const registerModelsToAudit = require('../utilities/auditService')
 const Review = require('./review')
 const Service = require('./service')
 const Plan = require('./plan')
+const Subscription = require('./subscription')
 
 // 1. one to many relationship between `User` and `Token` tables
 User.hasMany(Token, { onDelete: 'cascade' })
@@ -55,6 +56,13 @@ Review.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false 
 Service.hasMany(Plan);
 Plan.belongsTo(Service, { foreignKey: "serviceId" });
 
+// 10. one to many relationship between `User` and `Review` tables | `Kindergarten` and `Review`
+Kindergarten.hasMany(Subscription);
+Subscription.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
+
+Plan.hasMany(Subscription);
+Subscription.belongsTo(Plan, { foreignKey: "planId", allowNull: false });
+
 // create explicitly table if they are not exist
 (async () => {
     await Role.sync()
@@ -70,6 +78,7 @@ Plan.belongsTo(Service, { foreignKey: "serviceId" });
     await Review.sync()
     await Service.sync()
     await Plan.sync()
+    await Subscription.sync()
 
     // await Role.bulkCreate([
     //     { roleName: "Parent" },
@@ -94,5 +103,6 @@ Plan.belongsTo(Service, { foreignKey: "serviceId" });
 
 module.exports = {
     User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus, Audit, File, FILE_BELONGS_TO,
-    FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS, AUDIT_ACTIONS, Review, Service, Plan
+    FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS, AUDIT_ACTIONS, Review, Service, Plan,
+    Subscription
 }
