@@ -16,6 +16,7 @@ var AuditRouter = require('./routes/audit')
 var ReviewRouter = require('./routes/review')
 var ServiceRouter = require('./routes/service')
 var PlanRouter = require('./routes/plan')
+var SubscriptionRouter = require('./routes/subscription')
 
 var app = express();
 
@@ -35,7 +36,8 @@ app.use('/RegisterApplication', RegisterApplicationRouter);
 app.use('/audit', AuditRouter);
 app.use('/reviews', ReviewRouter);
 app.use('/services', ServiceRouter);
-app.use('/plans', PlanRouter)
+app.use('/plans', PlanRouter);
+app.use('/subscriptions', SubscriptionRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
