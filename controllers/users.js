@@ -1,4 +1,4 @@
-const { User, Token, Child, ChildStatus } = require('../models/associations')
+const { User, Token, Child, ChildStatus, Kindergarten } = require('../models/associations')
 const { ROLES, Role } = require('../models/role')
 const getImagesUtil = require('../utilities/getImagesUtil')
 
@@ -106,6 +106,23 @@ exports.getAllUsers = async (req, res) => {
         })
 
         res.status(200).send(users)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.getUserById = async (req, res) => {
+    try {
+        const user = await User.findOne({ where: { id: req.params.id } })
+
+        if (!user) {
+            return res.status(404).send()
+        }
+
+        const result = await getImagesUtil(user.id, "user")
+        user.dataValues.imgs = result.length == 0 ? result : result.data.imgs
+
+        res.status(200).send(user)
     } catch (e) {
         res.status(500).send()
     }
