@@ -79,6 +79,12 @@ exports.getAllKindergartenReviews = async (req, res) => {
             reviews.rows.forEach(r => delete r.user.dataValues.password)
         }
 
+        var ratingsSum = 0
+        reviews.rows.forEach(r => ratingsSum += r.rating)
+
+        reviews.numberOfRaters = reviews.rows.length
+        reviews.avgRating = ratingsSum / reviews.numberOfRaters
+
         res.status(200).send(reviews)
     } catch (e) {
         res.status(500).send()
