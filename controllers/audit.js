@@ -14,23 +14,28 @@ exports.getAllEntityRecordAudits = async (req, res) => {
         options['action'] = req.query.action
     }
 
+    if (req.query.filter != undefined) {
+        options['columnName'] = req.query.filter
+    }
+
     try {
-        const audits = await Audit.findAll({
+        const audits = await Audit.findAndCountAll({
             where: options,
             order: [['createdAt', orderOption]],
             offset: (pageNumber - 1) * pageSize,
-            limit: pageSize
+            limit: pageSize,
+            distinct: true
         })
 
         if (req.query.includeUser === "true") {
             const userIds = new Set()
-            audits.forEach(a => userIds.add(a.userId))
+            audits.rows.forEach(a => userIds.add(a.userId))
             const users = await User.findAll({
                 attributes: ['id', 'first_name', 'last_name', 'email', 'roleId'],
                 where: { id: [...userIds] }
             })
             const usersDict = Object.assign({}, ...users.map((u) => ({ [u.id]: u })))
-            audits.forEach(a => a.dataValues.user = usersDict[a.dataValues.userId])
+            audits.rows.forEach(a => a.dataValues.user = usersDict[a.dataValues.userId])
         }
 
         res.status(200).send(audits)
