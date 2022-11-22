@@ -71,7 +71,7 @@ exports.getChild = async (req, res) => {
         }
 
         const child = await Child.findOne({
-            where: (req.user.roleId == ROLES.KindergartenOwner) ?
+            where: (req.user.roleId != ROLES.Parent) ?
                 { id: req.params.id } : { id: req.params.id, userId: req.user.id }, include: includedTables
         })
 
