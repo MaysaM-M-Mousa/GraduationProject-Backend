@@ -11,7 +11,7 @@ router.post('/image/:belongsTo/:rowId', auth, checkIfBelongs, imageUploader.sing
 router.get('/image/:belongsTo/:rowId', fileController.getImage)
 
 router.post('/document/:belongsTo/:rowId', auth, checkIfBelongs, documentUploader.single('document'), fileController.uploadDocument, fileController.uploadFileErrorHandler)
-router.get('/document/:belongsTo/:rowId', auth, checkIfBelongs, fileController.getDocument)
+router.get('/document/:belongsTo/:rowId', auth, fileController.getDocument)
 
 router.delete('/:type/:belongsTo/:rowId', auth, checkIfBelongs, fileController.deleteFile)
 
