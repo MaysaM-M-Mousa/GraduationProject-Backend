@@ -18,6 +18,7 @@ var ServiceRouter = require('./routes/service')
 var PlanRouter = require('./routes/plan')
 var SubscriptionRouter = require('./routes/subscription')
 var JobRouter = require('./routes/jobs')
+var EmployeeRouter = require('./routes/employee')
 
 var app = express();
 
@@ -40,6 +41,7 @@ app.use('/services', ServiceRouter);
 app.use('/plans', PlanRouter);
 app.use('/subscriptions', SubscriptionRouter);
 app.use('/jobs', JobRouter);
+app.use('/employees', EmployeeRouter)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
