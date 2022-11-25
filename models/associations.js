@@ -13,6 +13,7 @@ const Review = require('./review')
 const Service = require('./service')
 const Plan = require('./plan')
 const Subscription = require('./subscription')
+const Job = require('./job')
 
 // 1. one to many relationship between `User` and `Token` tables
 User.hasMany(Token, { onDelete: 'cascade' })
@@ -63,6 +64,10 @@ Subscription.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: 
 Plan.hasMany(Subscription);
 Subscription.belongsTo(Plan, { foreignKey: "planId", allowNull: false });
 
+// 11. one to many relationship between `Kindergarten` and `Job` tables
+Kindergarten.hasMany(Job);
+Job.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
+
 // create explicitly table if they are not exist
 (async () => {
     await Role.sync()
@@ -79,7 +84,7 @@ Subscription.belongsTo(Plan, { foreignKey: "planId", allowNull: false });
     await Service.sync()
     await Plan.sync()
     await Subscription.sync()
-
+    await Job.sync()
     // await Role.bulkCreate([
     //     { roleName: "Parent" },
     //     { roleName: "KindergartenOwner" },
@@ -105,5 +110,5 @@ Subscription.belongsTo(Plan, { foreignKey: "planId", allowNull: false });
 module.exports = {
     User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus, Audit, File, FILE_BELONGS_TO,
     FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS, AUDIT_ACTIONS, Review, Service, Plan,
-    Subscription
+    Subscription, Job
 }
