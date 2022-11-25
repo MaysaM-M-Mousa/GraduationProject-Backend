@@ -1,4 +1,4 @@
-const { Kindergarten, User } = require('../models/associations')
+const { Kindergarten, User, Child, ChildStatus } = require('../models/associations')
 const { User_Kindergarten } = require('../models/associations')
 const getImagesUtil = require('../utilities/getImagesUtil')
 
@@ -61,6 +61,35 @@ exports.getAllKindergartens = async (req, res) => {
         }
 
         res.status(200).send(kindergartens)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.getAllChildrenForKindergarten = async (req, res) => {
+    const MAX_PAGE_SIZE = 10
+
+    const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
+    const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
+
+    const includedTables = []
+
+    if (req.query.includeChildStatus === "true") {
+        includedTables.push(ChildStatus)
+    }
+    
+    const filter = { kindergartenId: req.params.id }
+
+    try {
+        const children = await Child.findAndCountAll({
+            where: filter,
+            include: includedTables,
+            offset: (pageNumber - 1) * pageSize,
+            limit: pageSize,
+            distinct: true
+        })
+
+        res.status(200).send(children)
     } catch (e) {
         res.status(500).send()
     }
