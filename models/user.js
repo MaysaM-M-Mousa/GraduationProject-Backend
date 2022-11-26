@@ -50,8 +50,8 @@ const User = sequelize.define('user', {
     }
 }, {
     freezeTableName: true,
-    timestamps: false,
-    createdAt: false,
+    timestamps: true,
+    createdAt: true,
     updatedAt: false,
     hooks: {
         beforeCreate: async function (user) {

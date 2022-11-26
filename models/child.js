@@ -33,8 +33,8 @@ const Child = sequelize.define('child', {
     }
 }, {
     freezeTableName: true,
-    timestamps: false,
-    createdAt: false,
+    timestamps: true,
+    createdAt: true,
     updatedAt: false,
     hooks: {
         beforeCreate: async function (child) {

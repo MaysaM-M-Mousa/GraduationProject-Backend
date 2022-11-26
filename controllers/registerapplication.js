@@ -86,7 +86,7 @@ exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
 
 
         var filter = { kindergartenId: req.params.id }
-        if (req.query.applicationStatus > 0 && req.query.applicationStatus <= 3) {
+        if (req.query.applicationStatus > 0 && req.query.applicationStatus <= 4) {
             filter["application_status"] = req.query.applicationStatus
         }
 

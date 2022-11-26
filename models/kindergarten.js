@@ -56,11 +56,16 @@ const Kindergartedn = sequelize.define('kindergarten', {
         allowNull: true,
         trim: true,
         validate: { isURL: true }
+    }, about :{
+        type: Sequelize.STRING(4096),
+        field: 'about',
+        allowNull: true,
+        trim: true,
     }
 }, {
     freezeTableName: true,
-    timestamps: false,
-    createdAt: false,
+    timestamps: true,
+    createdAt: true,
     updatedAt: false,
     hooks: {
         beforeCreate(token) {

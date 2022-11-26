@@ -20,7 +20,8 @@ const RegisterApplication = sequelize.define('register_application', {
 const REGISTER_APPLICATION_STATUS = {
     UNDER_REVIEW: 1,
     APPROVED: 2,
-    CONFIRMED: 3
+    CONFIRMED: 3,
+    REJECTED: 4
 }
 
 module.exports = { RegisterApplication, REGISTER_APPLICATION_STATUS }
