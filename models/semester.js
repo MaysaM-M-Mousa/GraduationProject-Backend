@@ -20,6 +20,13 @@ const Semester = sequelize.define('semester', {
         validate: {
             isDate: true
         }
+    }, registrationExpiration: {
+        type: Sequelize.DATEONLY,
+        field: 'registration_expiration',
+        allowNull: false,
+        validate: {
+            isDate: true
+        }
     }, name: {
         type: Sequelize.STRING,
         field: 'name',
