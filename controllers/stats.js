@@ -151,3 +151,57 @@ exports.CountAllKindergartensBetweenTwoDates = async (req, res) => {
         res.status(500).send()
     }
 }
+
+exports.ChildrenGrouped = async (req, res) => {
+    try {
+        const allowedGroupOptions = ['gender', 'childStatus']
+
+        const groupOption = req.params.group
+
+        if (!allowedGroupOptions.includes(groupOption)) {
+            return res.status(400).send({ msg: `${groupOption} option is not supported!` })
+        }
+
+        const seqDict = {
+            'gender': { group: 'gender', attributes: ['gender'] },
+            'childStatus': {
+                group: (req.query.includeGender === "true") ? ['childStatusId', 'gender'] : 'childStatusId',
+                attributes: ['childStatusId', 'child_status.status_name'],
+                include: ChildStatus
+            }
+        }
+
+        const children = await Child.count(seqDict[groupOption])
+
+        res.status(200).send(children)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.CountAllChildrenDateOfBirth = async (req, res) => {
+    try {
+        var targetYear = (req.query.year == undefined) ? new Date().getFullYear() : req.query.year
+        var targetMonth = (req.query.month == undefined) ? undefined : req.query.month
+
+        const seqFuncOpts = {
+            Function: (targetMonth != undefined) ? "DAY" : "MONTH",
+            colName: (targetMonth != undefined) ? "day" : "month"
+        }
+
+        const children = await Child.count({
+            where: {
+                [Op.and]: [
+                    { createdAt: sequelize.where(sequelize.fn("YEAR", sequelize.col("date_of_birth")), targetYear) },
+                    (targetMonth != undefined) ? { createdAt: sequelize.where(sequelize.fn("MONTH", sequelize.col("date_of_birth")), targetMonth) } : []
+                ]
+            },
+            attributes: [[sequelize.fn(seqFuncOpts.Function, sequelize.col("date_of_birth")), seqFuncOpts.colName]],
+            group: [seqFuncOpts.colName],
+        })
+
+        res.status(200).send(children)
+    } catch (e) {
+        res.status(500).send()
+    }
+}

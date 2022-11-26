@@ -14,4 +14,7 @@ router.get('/kindergartens/grouping/:group', auth, verifyRoles(ROLES.Admin), sta
 router.get('/kindergartens/creation', auth, verifyRoles(ROLES.Admin), statsController.KindergartensCreation)
 router.get('/kindergartens/count', auth, verifyRoles(ROLES.Admin), statsController.CountAllKindergartensBetweenTwoDates)
 
+router.get('/children/grouping/:group', auth, verifyRoles(ROLES.Admin), statsController.ChildrenGrouped)
+router.get('/children/count/birth', auth, verifyRoles(ROLES.Admin), statsController.CountAllChildrenDateOfBirth)
+
 module.exports = router
