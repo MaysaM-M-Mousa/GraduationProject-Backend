@@ -40,11 +40,11 @@ Kindergarten.hasMany(Child, { onDelete: 'cascade' });
 Child.belongsTo(Kindergarten, { foreignKey: "kindergartenId" });
 
 // 7. one to many relationship between `Child` and `RegisterApplication` tables | `Kindergarten` and `RegisterApplication`
-Child.hasMany(RegisterApplication);
-RegisterApplication.belongsTo(Child, { foreignKey: "childId", allowNull: false });
+// Child.hasMany(RegisterApplication);
+// RegisterApplication.belongsTo(Child, { foreignKey: "childId", allowNull: false });
 
-Kindergarten.hasMany(RegisterApplication);
-RegisterApplication.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
+// Kindergarten.hasMany(RegisterApplication);
+// RegisterApplication.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
 
 // 8. one to many relationship between `User` and `Review` tables | `Kindergarten` and `Review`
 User.hasMany(Review);
@@ -67,6 +67,13 @@ Subscription.belongsTo(Plan, { foreignKey: "planId", allowNull: false });
 // 11. one to many relationship between `Kindergarten` and `Semester` tables
 Kindergarten.hasMany(Semester);
 Semester.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
+
+// 12. one to many relationship between `Child` and `RegisterApplication` tables | `Semester` and `RegisterApplication`
+Child.hasMany(RegisterApplication);
+RegisterApplication.belongsTo(Child, { foreignKey: "childId", allowNull: false });
+
+Semester.hasMany(RegisterApplication);
+RegisterApplication.belongsTo(Semester, { foreignKey: "semesterId", allowNull: false });
 
 // create explicitly table if they are not exist
 (async () => {
