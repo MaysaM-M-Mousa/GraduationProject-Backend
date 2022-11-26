@@ -17,6 +17,7 @@ var ReviewRouter = require('./routes/review')
 var ServiceRouter = require('./routes/service')
 var PlanRouter = require('./routes/plan')
 var SubscriptionRouter = require('./routes/subscription')
+var StatsRouter = require('./routes/stats')
 
 var app = express();
 
@@ -38,6 +39,7 @@ app.use('/reviews', ReviewRouter);
 app.use('/services', ServiceRouter);
 app.use('/plans', PlanRouter);
 app.use('/subscriptions', SubscriptionRouter);
+app.use('/stats', StatsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
