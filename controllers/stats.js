@@ -205,3 +205,30 @@ exports.CountAllChildrenDateOfBirth = async (req, res) => {
         res.status(500).send()
     }
 }
+
+exports.RegAppGrouped = async (req, res) => {
+    try {
+        const allowedGroupOptions = ['applicationStatus']
+
+        const groupOption = req.params.group
+        const startedDate = req.query.startDate
+        const endDate = req.query.endDate
+
+        if (!allowedGroupOptions.includes(groupOption)) {
+            return res.status(400).send({ msg: `${groupOption} option is not supported!` })
+        }
+
+        const seqDict = {
+            'applicationStatus': {
+                where: (startedDate != undefined && endDate != undefined) ? { createdAt: { [Op.between]: [startedDate, endDate] } } : {},
+                group: ['application_status'], attributes: ['application_status']
+            }
+        }
+
+        const apps = await RegisterApplication.count(seqDict[groupOption])
+
+        res.status(200).send(apps)
+    } catch (e) {
+        res.status(500).send()
+    }
+}

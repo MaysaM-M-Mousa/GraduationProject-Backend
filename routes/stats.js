@@ -17,4 +17,6 @@ router.get('/kindergartens/count', auth, verifyRoles(ROLES.Admin), statsControll
 router.get('/children/grouping/:group', auth, verifyRoles(ROLES.Admin), statsController.ChildrenGrouped)
 router.get('/children/count/birth', auth, verifyRoles(ROLES.Admin), statsController.CountAllChildrenDateOfBirth)
 
+router.get('/registerapplications/grouping/:group', auth, verifyRoles(ROLES.Admin), statsController.RegAppGrouped)
+
 module.exports = router
