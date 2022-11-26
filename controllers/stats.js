@@ -78,3 +78,76 @@ exports.CountAllUsersBetweenTwoDates = async (req, res) => {
         res.status(500).send()
     }
 }
+
+exports.KindergartensGrouped = async (req, res) => {
+    try {
+        const allowedGroupOptions = ['city', 'country']
+
+        const groupOption = req.params.group
+
+        if (!allowedGroupOptions.includes(groupOption)) {
+            return res.status(400).send({ msg: `${groupOption} option is not supported!` })
+        }
+
+        const seqDict = {
+            'country': { group: 'country', attributes: ['country'] },
+            'city': {
+                group: 'city', attributes: ['city'],
+                where: (req.query.country != undefined) ? { country: req.query.country } : {}
+            }
+        }
+
+        console.log(seqDict[groupOption])
+
+        const kindergartens = await Kindergarten.count(seqDict[groupOption])
+
+        res.status(200).send(kindergartens)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.KindergartensCreation = async (req, res) => {
+    try {
+        var targetYear = (req.query.year == undefined) ? new Date().getFullYear() : req.query.year
+        var targetMonth = (req.query.month == undefined) ? undefined : req.query.month
+
+        const seqFuncOpts = {
+            Function: (targetMonth != undefined) ? "DAY" : "MONTH",
+            colName: (targetMonth != undefined) ? "day" : "month"
+        }
+
+        const kindergartens = await Kindergarten.count({
+            where: {
+                [Op.and]: [
+                    { createdAt: sequelize.where(sequelize.fn("YEAR", sequelize.col("createdAt")), targetYear) },
+                    (targetMonth != undefined) ? { createdAt: sequelize.where(sequelize.fn("MONTH", sequelize.col("createdAt")), targetMonth) } : []
+                ]
+            },
+            attributes: [[sequelize.fn(seqFuncOpts.Function, sequelize.col("createdAt")), seqFuncOpts.colName]],
+            group: (req.query.includeRoles === "true") ? [seqFuncOpts.colName, "roleId", "role.role_name"] : [seqFuncOpts.colName],
+        })
+
+        res.status(200).send(kindergartens)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.CountAllKindergartensBetweenTwoDates = async (req, res) => {
+    try {
+        const startedDate = req.query.startDate
+        const endDate = req.query.endDate
+
+        const opts = {
+            where: { createdAt: { [Op.between]: [startedDate, endDate] } },
+        }
+
+        const kindergartens = await Kindergarten.count(opts)
+
+        res.status(200).send({ kindergartens })
+
+    } catch (e) {
+        res.status(500).send()
+    }
+}
