@@ -9,7 +9,7 @@ const ChildStatus = sequelize.define('child_status', {
     },
     statusName: {
         type: Sequelize.STRING,
-        field: 'role_name',
+        field: 'status_name',
         allowNull: false
     }
 }, {
