@@ -19,6 +19,7 @@ var PlanRouter = require('./routes/plan')
 var SubscriptionRouter = require('./routes/subscription')
 var StatsRouter = require('./routes/stats')
 var SemesterRouter = require('./routes/semester')
+var MatchingRouter = require('./routes/matching')
 
 var app = express();
 
@@ -41,15 +42,16 @@ app.use('/services', ServiceRouter);
 app.use('/plans', PlanRouter);
 app.use('/subscriptions', SubscriptionRouter);
 app.use('/stats', StatsRouter);
-app.use('/semesters', SemesterRouter)
+app.use('/semesters', SemesterRouter);
+app.use('/matching', MatchingRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
