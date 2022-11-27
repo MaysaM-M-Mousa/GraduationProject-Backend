@@ -22,7 +22,11 @@ exports.searchForKindergartens = async (req, res) => {
 
     const semesterToPush = {
         model: Semester,
-        where: { tuition: { [Op.between]: [minTuition, maxTuition] } }
+        where: {}
+    }
+
+    if (minTuition != undefined && maxTuition != undefined) {
+        semesterToPush['where']['tuition'] = { [Op.between]: [minTuition, maxTuition] }
     }
 
     if (registrationExpired != undefined && (registrationExpired === "true" || registrationExpired === "false")) {
@@ -32,7 +36,15 @@ exports.searchForKindergartens = async (req, res) => {
     const includedTables = []
     includedTables.push(semesterToPush)
 
-    const filter = { city: { [Op.like]: `%${city}%` }, country: { [Op.like]: `%${country}%` } }
+    const filter = {}
+
+    if (city != undefined) {
+        filter['city'] = { [Op.like]: `%${city}%` }
+    }
+
+    if (country != undefined) {
+        filter['country'] = { [Op.like]: `%${country}%` }
+    }
 
     const options = {
         where: filter,
