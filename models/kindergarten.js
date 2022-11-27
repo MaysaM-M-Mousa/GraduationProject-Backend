@@ -19,11 +19,11 @@ const Kindergartedn = sequelize.define('kindergarten', {
         field: 'location_formatted',
         allowNull: false
     }, latitude: {
-        type: Sequelize.DECIMAL(11, 2),
+        type: Sequelize.DECIMAL(11, 6),
         field: 'latitude',
         allowNull: false,
     }, longitude: {
-        type: Sequelize.DECIMAL(11, 2),
+        type: Sequelize.DECIMAL(11, 6),
         field: 'longitude',
         allowNull: false,
     }, email: {
