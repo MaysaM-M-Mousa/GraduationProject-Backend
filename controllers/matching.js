@@ -63,15 +63,16 @@ exports.searchForKindergartens = async (req, res) => {
             delete k.dataValues.semesters
         })
 
-        const filteredResult = kindergartens.rows.filter(k => {
-            const distance = (haversine({ lat: latitude, lng: longitude }, { lat: k.dataValues.latitude, lng: k.dataValues.longitude }) / 1000)
-            k.dataValues.distanceInKm = distance
-            return distance <= maxDistanceInKm
-        })
+        if (latitude != undefined && longitude != undefined && maxDistanceInKm != undefined) {
+            const filteredResult = kindergartens.rows.filter(k => {
+                const distance = (haversine({ lat: latitude, lng: longitude }, { lat: k.dataValues.latitude, lng: k.dataValues.longitude }) / 1000)
+                k.dataValues.distanceInKm = distance
+                return distance <= maxDistanceInKm
+            })
 
-        delete kindergartens.rows
-        kindergartens.rows = filteredResult
-
+            delete kindergartens.rows
+            kindergartens.rows = filteredResult
+        }
         for (var i = 0; i < kindergartens.rows.length; i++) {
             const result = await getImagesUtil(kindergartens.rows[i].dataValues.id, "kindergarten")
             kindergartens.rows[i].dataValues.imgs = result.length == 0 &&
