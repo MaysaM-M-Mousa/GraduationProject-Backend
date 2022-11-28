@@ -21,11 +21,6 @@ exports.createSemester = async (req, res) => {
             return res.status(400).send({ msg: `Your kindergarten have a running semester till ${currSemester.endDate}` })
         }
 
-        const startDate = new Date(req.body.startDate).getFullYear()
-        const endDate = new Date(req.body.endDate).getFullYear()
-
-        req.body.name = (startDate != endDate) ? startDate + "-" + endDate : startDate
-
         const semester = new Semester(req.body)
 
         await semester.save()
@@ -122,7 +117,7 @@ exports.updateSemester = async (req, res) => {
 
 exports.deleteSemester = async (req, res) => {
     try {
-        const semester = await Semester.findOne({ where: { kindergartenId: req.params.id }, include: Kindergarten })
+        const semester = await Semester.findOne({ where: { id: req.params.id }, include: Kindergarten })
 
         if (!semester) {
             return res.status(404).send()
