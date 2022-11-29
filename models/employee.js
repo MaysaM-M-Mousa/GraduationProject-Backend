@@ -40,6 +40,13 @@ const Employee = sequelize.define('employee', {
         validate: {
             isDate: true
         }
+    }, endDate: {
+        type: Sequelize.DATEONLY,
+        field: 'end_date',
+        allowNull: true,
+        validate: {
+            isDate: true
+        }
     }, dateOfBirth: {
         type: Sequelize.DATEONLY,
         field: 'date_of_birth',
@@ -47,7 +54,7 @@ const Employee = sequelize.define('employee', {
         validate: {
             isDate: true
         }
-    }, salary:{
+    }, salary: {
         type: Sequelize.DECIMAL,
         field: 'salary',
         allowNull: false,

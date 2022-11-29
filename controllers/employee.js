@@ -14,6 +14,8 @@ exports.createEmployee = async (req, res) => {
             return res.status(401).send({ msg: "This job does not belong to your kindergarten!" })
         }
 
+        req.body.endDate = null
+
         const employee = new Employee(req.body)
 
         await employee.save()
@@ -136,7 +138,7 @@ exports.getAllEmployeesForKindergarten = async (req, res) => {
 
 exports.updateEmployee = async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ["firstName", "lastName", "email", "phone", "country", "city", "hireDate", "dateOfBirth", "salary", "jobId"]
+    const allowedUpdates = ["firstName", "lastName", "email", "phone", "country", "city", "hireDate", "endDate","dateOfBirth", "salary"]
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
