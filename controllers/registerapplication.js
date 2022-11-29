@@ -1,5 +1,7 @@
 const { Kindergarten, RegisterApplication, REGISTER_APPLICATION_STATUS, Child, User, User_Kindergarten, Semester } = require("../models/associations")
+const { CHILD_STATUS } = require("../models/childstatus")
 const { ROLES } = require("../models/role")
+const mailService = require('../utilities/mailUtil')
 
 exports.createRegistrationApplication = async (req, res) => {
     try {
@@ -172,14 +174,30 @@ exports.updateRegApp = async (req, res) => {
             return res.status(401).send({ msg: "This application does not belong to you!" })
         }
 
-        app.ApplicationStatus = req.body['applicationStatus']
+        const newStatus = req.body['applicationStatus']
+        app.ApplicationStatus = newStatus
 
         await app.save({ id: req.user.id })
+
+        const child = await Child.findOne({ where: { id: app.childId }, include: User })
+
+        if (newStatus == REGISTER_APPLICATION_STATUS.APPROVED) {
+            mailService.sendRegAppApprovalEmail(child.user.email, child.firstName)
+        } else if (newStatus == REGISTER_APPLICATION_STATUS.REJECTED) {
+            mailService.sendRegAppRejectionEmail(child.user.email, child.firstName)
+        } else if (newStatus == REGISTER_APPLICATION_STATUS.CONFIRMED) {
+            deleteOtherRegApps(child.id, child.user.email, child.user.firstName, child.firstName)
+            child['kindergartenId'] = app.semester.kindergarten.id
+            child['childStatusId'] = CHILD_STATUS.Enrolled
+            await child.save()
+            mailService.sendRegAppConfirmationEmail(child.user.email, child.firstName)
+        }
 
         delete app.dataValues.semester
 
         return res.status(200).send(app)
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 }
@@ -201,5 +219,16 @@ exports.deleteRegApp = async (req, res) => {
         res.status(200).send()
     } catch (e) {
         res.status(500).send()
+    }
+}
+
+const deleteOtherRegApps = async (childId, parentEmail, parentName, childName) => {
+    try {
+        await RegisterApplication.destroy({
+            where: { childId: childId, application_status: REGISTER_APPLICATION_STATUS.UNDER_REVIEW }
+        })
+        mailService.sendDeletionOtherRegAppsEmail(parentEmail, parentName, childName)
+    } catch (e) {
+        return e
     }
 }
