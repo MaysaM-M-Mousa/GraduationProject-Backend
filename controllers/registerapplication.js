@@ -163,13 +163,13 @@ exports.updateRegApp = async (req, res) => {
             include: { model: Semester, include: { model: Kindergarten } }
         })
 
+        if (!app) {
+            return res.status(404).send()
+        }
+
         if (req.user.roleId == ROLES.KindergartenOwner &&
             !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: app.semester.kindergarten.id } })) {
             return res.status(401).send({ msg: "This application does not belong to you!" })
-        }
-
-        if (!app) {
-            return res.status(404).send()
         }
 
         app.ApplicationStatus = req.body['applicationStatus']
