@@ -16,6 +16,7 @@ const Subscription = require('./subscription')
 const Job = require('./job')
 const Employee = require('./employee') 
 const Bonus = require('./bonus')
+const TimeOffCategory = require('./timeoffcategory')
 
 // 1. one to many relationship between `User` and `Token` tables
 User.hasMany(Token, { onDelete: 'cascade' })
@@ -78,6 +79,10 @@ Employee.belongsTo(Job, { foreignKey: "jobId", allowNull: false });
 Employee.hasMany(Bonus);
 Bonus.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
 
+// 14. one to many relationship between `TimeOffCategory` and `Kindergarten` tables
+Kindergarten.hasMany(TimeOffCategory);
+TimeOffCategory.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
+
 // create explicitly table if they are not exist
 (async () => {
     await Role.sync()
@@ -97,6 +102,7 @@ Bonus.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
     await Job.sync()
     await Employee.sync()
     await Bonus.sync()
+    await TimeOffCategory.sync()
 
     // await Role.bulkCreate([
     //     { roleName: "Parent" },
@@ -123,5 +129,5 @@ Bonus.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
 module.exports = {
     User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus, Audit, File, FILE_BELONGS_TO,
     FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS, AUDIT_ACTIONS, Review, Service, Plan,
-    Subscription, Job, Employee, Bonus
+    Subscription, Job, Employee, Bonus, TimeOffCategory
 }
