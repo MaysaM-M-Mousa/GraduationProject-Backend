@@ -21,6 +21,7 @@ var JobRouter = require('./routes/jobs')
 var EmployeeRouter = require('./routes/employee')
 var BonusController = require('./routes/bonus')
 var TimeOffCategoryController = require('./routes/timeoffcategory')
+var TimeOffController = require('./routes/timeoff')
 
 var app = express();
 
@@ -46,6 +47,7 @@ app.use('/jobs', JobRouter);
 app.use('/employees', EmployeeRouter);
 app.use('/bonuses', BonusController);
 app.use('/timeoffcategories', TimeOffCategoryController);
+app.use('/timeoffs', TimeOffController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
