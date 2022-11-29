@@ -6,7 +6,7 @@ const mailService = require('../utilities/mailUtil')
 exports.createRegistrationApplication = async (req, res) => {
     try {
         if (!req.body.childId || !req.body.semesterId) {
-            res.status(400).send({ msg: "Make sure you are passing the right parameters!" })
+            return res.status(400).send({ msg: "Make sure you are passing the right parameters!" })
         }
 
         const child = await Child.findOne({ where: { id: req.body['childId'], userId: req.user.id } })
