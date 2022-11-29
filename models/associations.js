@@ -14,9 +14,10 @@ const Service = require('./service')
 const Plan = require('./plan')
 const Subscription = require('./subscription')
 const Job = require('./job')
-const Employee = require('./employee') 
+const Employee = require('./employee')
 const Bonus = require('./bonus')
 const TimeOffCategory = require('./timeoffcategory')
+const TimeOff = require('./timeoff')
 
 // 1. one to many relationship between `User` and `Token` tables
 User.hasMany(Token, { onDelete: 'cascade' })
@@ -83,6 +84,14 @@ Bonus.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
 Kindergarten.hasMany(TimeOffCategory);
 TimeOffCategory.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
 
+// 15. one to many relationship between `TimeOffCategory` and `TimeOff` tables
+TimeOffCategory.hasMany(TimeOff);
+TimeOff.belongsTo(TimeOffCategory, { foreignKey: "timeOffCategoryId", allowNull: false });
+
+// 16. one to many relationship between `TimeOffCategory` and `TimeOff` tables
+Employee.hasMany(TimeOff);
+TimeOff.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
+
 // create explicitly table if they are not exist
 (async () => {
     await Role.sync()
@@ -103,6 +112,7 @@ TimeOffCategory.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNul
     await Employee.sync()
     await Bonus.sync()
     await TimeOffCategory.sync()
+    await TimeOff.sync()
 
     // await Role.bulkCreate([
     //     { roleName: "Parent" },
@@ -129,5 +139,5 @@ TimeOffCategory.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNul
 module.exports = {
     User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus, Audit, File, FILE_BELONGS_TO,
     FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS, AUDIT_ACTIONS, Review, Service, Plan,
-    Subscription, Job, Employee, Bonus, TimeOffCategory
+    Subscription, Job, Employee, Bonus, TimeOffCategory, TimeOff
 }
