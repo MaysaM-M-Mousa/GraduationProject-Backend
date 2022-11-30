@@ -1,4 +1,4 @@
-const { Kindergarten, User, Child, ChildStatus } = require('../models/associations')
+const { Kindergarten, User, Child, ChildStatus, Semester } = require('../models/associations')
 const { User_Kindergarten } = require('../models/associations')
 const getImagesUtil = require('../utilities/getImagesUtil')
 
@@ -23,7 +23,14 @@ exports.createKindergarten = async (req, res) => {
 
 exports.getKindergartenByPK = async (req, res) => {
     try {
-        const kindergarten = await Kindergarten.findByPk(req.params.id)
+        const options = { id: req.params.id }
+
+        if (req.query.includeRunningSemester === "true") {
+            options['include'] = Semester
+            options['order'] = [[Semester, 'startDate', 'desc']]
+        }
+
+        const kindergarten = await Kindergarten.findOne(options)
 
         if (kindergarten == null) {
             return res.status(404).send()
@@ -31,6 +38,11 @@ exports.getKindergartenByPK = async (req, res) => {
 
         const result = await getImagesUtil(kindergarten.id, "kindergarten")
         kindergarten.dataValues.imgs = result.length == 0 ? result : result.data.imgs
+
+        if (req.query.includeRunningSemester === "true") {
+            kindergarten.dataValues.runningSemester = kindergarten.dataValues.semesters[0]
+            delete kindergarten.dataValues.semesters
+        }
 
         res.status(200).send(kindergarten)
     } catch (e) {
@@ -77,7 +89,7 @@ exports.getAllChildrenForKindergarten = async (req, res) => {
     if (req.query.includeChildStatus === "true") {
         includedTables.push(ChildStatus)
     }
-    
+
     const filter = { kindergartenId: req.params.id }
 
     try {
