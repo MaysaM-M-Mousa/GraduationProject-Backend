@@ -1,7 +1,8 @@
-const { User, Kindergarten, Child, ChildStatus, RegisterApplication } = require('../models/associations')
+const { User, Kindergarten, Child, ChildStatus, RegisterApplication, Semester, User_Kindergarten, REGISTER_APPLICATION_STATUS } = require('../models/associations')
 const { Op } = require('sequelize')
 const sequelize = require('sequelize')
-const { Role } = require('../models/role')
+const { Role, ROLES } = require('../models/role')
+const db = require('../db/mysql')
 
 exports.UsersGrouped = async (req, res) => {
     try {
@@ -226,6 +227,186 @@ exports.RegAppGrouped = async (req, res) => {
         }
 
         const apps = await RegisterApplication.count(seqDict[groupOption])
+
+        res.status(200).send(apps)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.groupParentsForSemester = async (req, res) => {
+    try {
+        const allowedGroupOptions = ['country', 'city']
+
+        const groupOption = req.params.group
+
+        if (!allowedGroupOptions.includes(groupOption)) {
+            return res.status(400).send({ msg: `${groupOption} entity is not supported!` })
+        }
+
+        const semester = await Semester.findOne({ where: { id: req.params.id } })
+
+        if (!semester) {
+            return res.status(404).send()
+        }
+
+        if (req.user.roleId == ROLES.KindergartenOwner &&
+            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergartenId } })) {
+            return res.status(401).send({ msg: "This semester does not belong to your kindergarten!" })
+        }
+
+        const apps = await db.query(
+            `SELECT
+                u.${groupOption},
+                COUNT(u.${groupOption}) AS count
+            FROM
+                register_application ra
+            LEFT OUTER JOIN child c ON
+                ra.childId = c.id AND ra.semesterId = ${req.params.id}
+            LEFT OUTER JOIN user u ON
+                c.userId = u.id
+            GROUP BY
+                u.${groupOption}`,
+            { raw: true, type: sequelize.QueryTypes.SELECT }
+        )
+
+        res.status(200).send(apps)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.frequencyOfNumberOfChildrenForSemester = async (req, res) => {
+    try {
+        const semester = await Semester.findOne({ where: { id: req.params.id } })
+
+        if (!semester) {
+            return res.status(404).send()
+        }
+
+        if (req.user.roleId == ROLES.KindergartenOwner &&
+            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergartenId } })) {
+            return res.status(401).send({ msg: "This semester does not belong to your kindergarten!" })
+        }
+
+        const result = await db.query(
+            `
+            SELECT
+                T.NumberOfChildrenForSameParent,
+                COUNT(T.NumberOfChildrenForSameParent) AS frequency
+            FROM
+                (
+                SELECT
+                    c.userId,
+                    COUNT(c.userId) AS NumberOfChildrenForSameParent
+                FROM
+                    register_application ra
+                INNER JOIN child c ON
+                    ra.childId = c.id AND ra.semesterId = ${req.params.id}
+                GROUP BY
+                    c.userId
+            ) AS T
+            GROUP BY
+                T.NumberOfChildrenForSameParent
+            ` ,
+            { raw: true, type: sequelize.QueryTypes.SELECT }
+        )
+
+        res.status(200).send(result)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.groupChildrenByGenderForSemester = async (req, res) => {
+    try {
+        const semester = await Semester.findOne({ where: { id: req.params.id } })
+
+        if (!semester) {
+            return res.status(404).send()
+        }
+
+        if (req.user.roleId == ROLES.KindergartenOwner &&
+            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergartenId } })) {
+            return res.status(401).send({ msg: "This semester does not belong to your kindergarten!" })
+        }
+
+        const result = await RegisterApplication.count({
+            where: { semesterId: req.params.id },
+            include: { model: Child, attributes: ['gender'] },
+            group: ['child.gender']
+        })
+
+        res.status(200).send(result)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.groupChildernForSemesterByBirth = async (req, res) => {
+    try {
+        const semester = await Semester.findOne({ where: { id: req.params.id } })
+
+        if (!semester) {
+            return res.status(404).send()
+        }
+
+        if (req.user.roleId == ROLES.KindergartenOwner &&
+            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergartenId } })) {
+            return res.status(401).send({ msg: "This semester does not belong to your kindergarten!" })
+        }
+
+        var targetYear = (req.query.year == undefined) ? new Date().getFullYear() : req.query.year
+        var targetMonth = (req.query.month == undefined) ? undefined : req.query.month
+
+        const seqFuncOpts = {
+            Function: (targetMonth != undefined) ? "DAY" : "MONTH",
+            colName: (targetMonth != undefined) ? "day" : "month"
+        }
+
+        const result = await db.query(
+            `
+            SELECT
+                ${seqFuncOpts.Function}(c.date_of_birth) AS ${seqFuncOpts.colName},
+                COUNT(*) AS count
+            FROM
+                register_application ra
+            INNER JOIN child c ON
+                ra.childId = c.id AND YEAR(c.date_of_birth) = ${targetYear} 
+                                  AND ra.semesterId = ${req.params.id}
+                                  ${(targetMonth != undefined) ? `AND MONTH(c.date_of_birth) = ${targetMonth}` : ``}
+            GROUP BY
+                ${seqFuncOpts.colName}
+            ` ,
+            { raw: true, type: sequelize.QueryTypes.SELECT }
+        )
+
+        res.status(200).send(result)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.RegAppGroupedByStatusForKindergarten = async (req, res) => {
+    try {
+        const semester = await Semester.findOne({ where: { id: req.params.id } })
+
+        if (!semester) {
+            return res.status(404).send()
+        }
+
+        if (req.user.roleId == ROLES.KindergartenOwner &&
+            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergartenId } })) {
+            return res.status(401).send({ msg: "This semester does not belong to your kindergarten!" })
+        }
+
+        const apps = await RegisterApplication.count({
+            where: { semesterId: req.params.id },
+            group: ['application_status'],
+            attributes: ['application_status']
+        })
+
+        apps.forEach(v => v.status_name = Object.keys(REGISTER_APPLICATION_STATUS)[v.application_status - 1])
 
         res.status(200).send(apps)
     } catch (e) {
