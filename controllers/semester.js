@@ -1,6 +1,7 @@
-const { Semester, User_Kindergarten, Kindergarten } = require('../models/associations')
+const { Semester, User_Kindergarten, Kindergarten, Child } = require('../models/associations')
 const { ROLES } = require('../models/role')
 const { Op } = require('sequelize')
+const { CHILD_STATUS } = require('../models/childstatus')
 
 exports.createSemester = async (req, res) => {
     try {
@@ -66,6 +67,37 @@ exports.getAllSemestersForKindergarten = async (req, res) => {
         })
 
         res.status(200).send(semester)
+    } catch (e) {
+        res.status(500).send()
+    }
+}
+
+exports.getAllEnrolledChildrenForSemester = async (req, res) => {
+    const MAX_PAGE_SIZE = 10
+
+    const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
+    const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
+
+    try {
+        const semester = await Semester.findOne({ where: { id: req.params.id } })
+
+        if (!semester) {
+            return res.status(404).send()
+        }
+
+        if (req.user.roleId == ROLES.KindergartenOwner &&
+            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergartenId } })) {
+            return res.status(401).send({ msg: "This kindergarten does not belong to you!" })
+        }
+
+        const children = await Child.findAndCountAll({
+            where: { kindergartenId: semester.kindergartenId, childStatusId: CHILD_STATUS.Enrolled },
+            offset: (pageNumber - 1) * pageSize,
+            limit: pageSize,
+            distinct: true
+        })
+
+        res.status(200).send(children)
     } catch (e) {
         res.status(500).send()
     }
