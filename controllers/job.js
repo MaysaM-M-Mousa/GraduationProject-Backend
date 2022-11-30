@@ -65,6 +65,8 @@ exports.getAllJobsForKindergarten = async (req, res) => {
             distinct: true
         })
 
+        jobs.jobFreqs = jobs.rows.reduce((a, { jobTitle }) => (Object.assign(a, { [jobTitle]: (a[jobTitle] || 0) + 1 })), {})
+
         res.status(200).send(jobs)
     } catch (e) {
         res.status(500).send()
