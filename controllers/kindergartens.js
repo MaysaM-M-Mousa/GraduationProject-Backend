@@ -23,7 +23,7 @@ exports.createKindergarten = async (req, res) => {
 
 exports.getKindergartenByPK = async (req, res) => {
     try {
-        const options = { id: req.params.id }
+        const options = { where: { id: req.params.id } }
 
         if (req.query.includeRunningSemester === "true") {
             options['include'] = Semester
@@ -40,12 +40,17 @@ exports.getKindergartenByPK = async (req, res) => {
         kindergarten.dataValues.imgs = result.length == 0 ? result : result.data.imgs
 
         if (req.query.includeRunningSemester === "true") {
-            kindergarten.dataValues.runningSemester = kindergarten.dataValues.semesters[0]
+            const today = new Date(new Date().toISOString().slice(0, 10))
+
+            kindergarten.dataValues.runningSemester = (kindergarten.dataValues.semesters.length > 0)
+                ? ((today > new Date(kindergarten.dataValues.semesters[0].endDate)) ? null : kindergarten.dataValues.semesters[0])
+                : null
             delete kindergarten.dataValues.semesters
         }
 
         res.status(200).send(kindergarten)
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 }
