@@ -138,10 +138,28 @@ exports.updateKindergartenById = async (req, res) => {
 
 exports.getAllOwnersKindergartens = async (req, res) => {
     try {
-        const user = await User.findOne({ where: { id: req.user.id }, include: Kindergarten })
+        const options = { where: { id: req.user.id }, include: { model: Kindergarten } }
+
+        if (req.query.includeRunningSemester === "true") {
+            options['include'] = { model: Kindergarten, include: Semester }
+            options['order'] = [[Kindergarten, Semester, 'startDate', 'desc']]
+        }
+
+        const user = await User.findOne(options)
 
         if (!user) {
             return res.status(404).send()
+        }
+
+        if (req.query.includeRunningSemester === "true") {
+            const today = new Date(new Date().toISOString().slice(0, 10))
+            user.kindergartens.forEach(k => {
+                k.dataValues.runningSemester =
+                    (k.dataValues.semesters.length) > 0
+                        ? ((today > new Date(k.dataValues.semesters[0].endDate)) ? null : k.dataValues.semesters[0])
+                        : null
+                delete k.dataValues.semesters
+            })
         }
 
         if (req.query.includeImages === "true") {
