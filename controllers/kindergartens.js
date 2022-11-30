@@ -1,4 +1,4 @@
-const { Kindergarten, User, Child, ChildStatus } = require('../models/associations')
+const { Kindergarten, User, Child, ChildStatus, Semester } = require('../models/associations')
 const { User_Kindergarten } = require('../models/associations')
 const getImagesUtil = require('../utilities/getImagesUtil')
 
@@ -23,7 +23,14 @@ exports.createKindergarten = async (req, res) => {
 
 exports.getKindergartenByPK = async (req, res) => {
     try {
-        const kindergarten = await Kindergarten.findByPk(req.params.id)
+        const options = { id: req.params.id }
+
+        if (req.query.includeRunningSemester === "true") {
+            options['include'] = Semester
+            options['order'] = [[Semester, 'startDate', 'desc']]
+        }
+
+        const kindergarten = await Kindergarten.findOne(options)
 
         if (kindergarten == null) {
             return res.status(404).send()
@@ -31,6 +38,11 @@ exports.getKindergartenByPK = async (req, res) => {
 
         const result = await getImagesUtil(kindergarten.id, "kindergarten")
         kindergarten.dataValues.imgs = result.length == 0 ? result : result.data.imgs
+
+        if (req.query.includeRunningSemester === "true") {
+            kindergarten.dataValues.runningSemester = kindergarten.dataValues.semesters[0]
+            delete kindergarten.dataValues.semesters
+        }
 
         res.status(200).send(kindergarten)
     } catch (e) {
@@ -77,7 +89,7 @@ exports.getAllChildrenForKindergarten = async (req, res) => {
     if (req.query.includeChildStatus === "true") {
         includedTables.push(ChildStatus)
     }
-    
+
     const filter = { kindergartenId: req.params.id }
 
     try {
@@ -97,7 +109,7 @@ exports.getAllChildrenForKindergarten = async (req, res) => {
 
 exports.updateKindergartenById = async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ['name', 'locationFormatted', 'latitude', 'longitude', 'email', 'phone']
+    const allowedUpdates = ['name', 'locationFormatted', 'latitude', 'longitude', 'email', 'phone', 'about']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
@@ -126,10 +138,28 @@ exports.updateKindergartenById = async (req, res) => {
 
 exports.getAllOwnersKindergartens = async (req, res) => {
     try {
-        const user = await User.findOne({ where: { id: req.user.id }, include: Kindergarten })
+        const options = { where: { id: req.user.id }, include: { model: Kindergarten } }
+
+        if (req.query.includeRunningSemester === "true") {
+            options['include'] = { model: Kindergarten, include: Semester }
+            options['order'] = [[Kindergarten, Semester, 'startDate', 'desc']]
+        }
+
+        const user = await User.findOne(options)
 
         if (!user) {
             return res.status(404).send()
+        }
+
+        if (req.query.includeRunningSemester === "true") {
+            const today = new Date(new Date().toISOString().slice(0, 10))
+            user.kindergartens.forEach(k => {
+                k.dataValues.runningSemester =
+                    (k.dataValues.semesters.length) > 0
+                        ? ((today > new Date(k.dataValues.semesters[0].endDate)) ? null : k.dataValues.semesters[0])
+                        : null
+                delete k.dataValues.semesters
+            })
         }
 
         if (req.query.includeImages === "true") {

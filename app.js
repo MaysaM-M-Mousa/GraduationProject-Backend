@@ -17,11 +17,14 @@ var ReviewRouter = require('./routes/review')
 var ServiceRouter = require('./routes/service')
 var PlanRouter = require('./routes/plan')
 var SubscriptionRouter = require('./routes/subscription')
+var StatsRouter = require('./routes/stats')
+var SemesterRouter = require('./routes/semester')
+var MatchingRouter = require('./routes/matching')
 var JobRouter = require('./routes/jobs')
 var EmployeeRouter = require('./routes/employee')
-var BonusController = require('./routes/bonus')
-var TimeOffCategoryController = require('./routes/timeoffcategory')
-var TimeOffController = require('./routes/timeoff')
+var BonusRouter = require('./routes/bonus')
+var TimeOffCategoryRouter = require('./routes/timeoffcategory')
+var TimeOffRouter = require('./routes/timeoff')
 
 var app = express();
 
@@ -43,19 +46,22 @@ app.use('/reviews', ReviewRouter);
 app.use('/services', ServiceRouter);
 app.use('/plans', PlanRouter);
 app.use('/subscriptions', SubscriptionRouter);
+app.use('/stats', StatsRouter);
+app.use('/semesters', SemesterRouter);
+app.use('/matching', MatchingRouter);
 app.use('/jobs', JobRouter);
 app.use('/employees', EmployeeRouter);
-app.use('/bonuses', BonusController);
-app.use('/timeoffcategories', TimeOffCategoryController);
-app.use('/timeoffs', TimeOffController);
+app.use('/bonuses', BonusRouter);
+app.use('/timeoffcategories', TimeOffCategoryRouter);
+app.use('/timeoffs', TimeOffRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

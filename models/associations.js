@@ -13,6 +13,7 @@ const Review = require('./review')
 const Service = require('./service')
 const Plan = require('./plan')
 const Subscription = require('./subscription')
+const Semester = require('./semester')
 const Job = require('./job')
 const Employee = require('./employee')
 const Bonus = require('./bonus')
@@ -44,11 +45,11 @@ Kindergarten.hasMany(Child, { onDelete: 'cascade' });
 Child.belongsTo(Kindergarten, { foreignKey: "kindergartenId" });
 
 // 7. one to many relationship between `Child` and `RegisterApplication` tables | `Kindergarten` and `RegisterApplication`
-Child.hasMany(RegisterApplication);
-RegisterApplication.belongsTo(Child, { foreignKey: "childId", allowNull: false });
+// Child.hasMany(RegisterApplication);
+// RegisterApplication.belongsTo(Child, { foreignKey: "childId", allowNull: false });
 
-Kindergarten.hasMany(RegisterApplication);
-RegisterApplication.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
+// Kindergarten.hasMany(RegisterApplication);
+// RegisterApplication.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
 
 // 8. one to many relationship between `User` and `Review` tables | `Kindergarten` and `Review`
 User.hasMany(Review);
@@ -61,34 +62,45 @@ Review.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false 
 Service.hasMany(Plan);
 Plan.belongsTo(Service, { foreignKey: "serviceId" });
 
-// 10. one to many relationship between `User` and `Review` tables | `Kindergarten` and `Review`
+// 10. one to many relationship between `User` and `Review` tables
 Kindergarten.hasMany(Subscription);
 Subscription.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
 
 Plan.hasMany(Subscription);
 Subscription.belongsTo(Plan, { foreignKey: "planId", allowNull: false });
 
-// 11. one to many relationship between `Kindergarten` and `Job` tables
+// 11. one to many relationship between `Kindergarten` and `Semester` tables
+Kindergarten.hasMany(Semester);
+Semester.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
+
+// 12. one to many relationship between `Child` and `RegisterApplication` tables | `Semester` and `RegisterApplication`
+Child.hasMany(RegisterApplication);
+RegisterApplication.belongsTo(Child, { foreignKey: "childId", allowNull: false });
+
+Semester.hasMany(RegisterApplication);
+RegisterApplication.belongsTo(Semester, { foreignKey: "semesterId", allowNull: false });
+
+// 13. one to many relationship between `Kindergarten` and `Job` tables
 Kindergarten.hasMany(Job);
 Job.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
 
-// 12. one to many relationship between `Job` and `Employee` tables
+// 14. one to many relationship between `Job` and `Employee` tables
 Job.hasMany(Employee);
 Employee.belongsTo(Job, { foreignKey: "jobId", allowNull: false });
 
-// 13. one to many relationship between `Employee` and `Bonus` tables
+// 15. one to many relationship between `Employee` and `Bonus` tables
 Employee.hasMany(Bonus);
 Bonus.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
 
-// 14. one to many relationship between `TimeOffCategory` and `Kindergarten` tables
+// 16. one to many relationship between `TimeOffCategory` and `Kindergarten` tables
 Kindergarten.hasMany(TimeOffCategory);
 TimeOffCategory.belongsTo(Kindergarten, { foreignKey: "kindergartenId", allowNull: false });
 
-// 15. one to many relationship between `TimeOffCategory` and `TimeOff` tables
+// 17. one to many relationship between `TimeOffCategory` and `TimeOff` tables
 TimeOffCategory.hasMany(TimeOff);
 TimeOff.belongsTo(TimeOffCategory, { foreignKey: "timeOffCategoryId", allowNull: false });
 
-// 16. one to many relationship between `TimeOffCategory` and `TimeOff` tables
+// 18. one to many relationship between `TimeOffCategory` and `TimeOff` tables
 Employee.hasMany(TimeOff);
 TimeOff.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
 
@@ -108,6 +120,7 @@ TimeOff.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
     await Service.sync()
     await Plan.sync()
     await Subscription.sync()
+    await Semester.sync()
     await Job.sync()
     await Employee.sync()
     await Bonus.sync()
@@ -139,5 +152,5 @@ TimeOff.belongsTo(Employee, { foreignKey: "employeeId", allowNull: false });
 module.exports = {
     User, Token, Role, Kindergarten, User_Kindergarten, Child, ChildStatus, Audit, File, FILE_BELONGS_TO,
     FILE_TYPES, RegisterApplication, REGISTER_APPLICATION_STATUS, AUDIT_ACTIONS, Review, Service, Plan,
-    Subscription, Job, Employee, Bonus, TimeOffCategory, TimeOff
+    Subscription, Semester, Job, Employee, Bonus, TimeOffCategory, TimeOff
 }

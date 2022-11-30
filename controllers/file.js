@@ -11,7 +11,7 @@ exports.uploadImage = async (req, res) => {
     try {
         const { filename: image } = req.file
 
-        await sharp(req.file.path).resize(dims).png().toFile(path.join(req.file.destination, "resized" + image))
+        await sharp(req.file.path).resize().png().toFile(path.join(req.file.destination, "resized" + image))
 
         fs.unlinkSync(req.file.path)
 
