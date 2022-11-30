@@ -47,24 +47,6 @@ exports.createRegistrationApplication = async (req, res) => {
     }
 }
 
-const getIncludedTablesForRegApp = (p1, p2, p3) => {
-    includedTables = []
-
-    if (p1 === "true") {
-        arr = []
-        if (p2 === "true") {
-            arr.push(User)
-        }
-        includedTables.push({ model: Child, include: arr })
-    }
-
-    if (p3 === "true") {
-        includedTables.push(Kindergarten)
-    }
-
-    return includedTables
-}
-
 exports.getRegisterApplicationById = async (req, res) => {
     includedTables = []
 
