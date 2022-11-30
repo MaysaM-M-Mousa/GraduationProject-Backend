@@ -149,14 +149,14 @@ exports.updateSemester = async (req, res) => {
 
 exports.deleteSemester = async (req, res) => {
     try {
-        const semester = await Semester.findOne({ where: { id: req.params.id }, include: Kindergarten })
+        const semester = await Semester.findOne({ where: { id: req.params.id } })
 
         if (!semester) {
             return res.status(404).send()
         }
 
         if (req.user.roleId == ROLES.KindergartenOwner &&
-            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergarten.id } })) {
+            !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: semester.kindergartenId } })) {
             return res.status(401).send({ msg: "This kindergarten does not belong to you!" })
         }
 
