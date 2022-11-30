@@ -182,15 +182,15 @@ exports.updateRegApp = async (req, res) => {
         const child = await Child.findOne({ where: { id: app.childId }, include: User })
 
         if (newStatus == REGISTER_APPLICATION_STATUS.APPROVED) {
-            mailService.sendRegAppApprovalEmail(child.user.email, child.firstName)
+            await mailService.sendRegAppApprovalEmail('maysam.m.mousa@gmail.com', child.user.firstName, child.firstName, app.semester)
         } else if (newStatus == REGISTER_APPLICATION_STATUS.REJECTED) {
-            mailService.sendRegAppRejectionEmail(child.user.email, child.firstName)
+            await mailService.sendRegAppRejectionEmail(child.user.email, child.user.firstName, child.firstName, app.semester)
         } else if (newStatus == REGISTER_APPLICATION_STATUS.CONFIRMED) {
-            deleteOtherRegApps(child.id, child.user.email, child.user.firstName, child.firstName)
+            await mailService.sendRegAppConfirmationEmail(child.user.email, child.user.firstName, child.firstName, app.semester)
             child['kindergartenId'] = app.semester.kindergarten.id
             child['childStatusId'] = CHILD_STATUS.Enrolled
             await child.save()
-            mailService.sendRegAppConfirmationEmail(child.user.email, child.firstName)
+            await deleteOtherRegApps(child.id, child.user.email, child.user.firstName, child.firstName, app.semester)
         }
 
         delete app.dataValues.semester
@@ -222,12 +222,12 @@ exports.deleteRegApp = async (req, res) => {
     }
 }
 
-const deleteOtherRegApps = async (childId, parentEmail, parentName, childName) => {
+const deleteOtherRegApps = async (childId, parentEmail, parentName, childName, semester) => {
     try {
         await RegisterApplication.destroy({
             where: { childId: childId, application_status: REGISTER_APPLICATION_STATUS.UNDER_REVIEW }
         })
-        mailService.sendDeletionOtherRegAppsEmail(parentEmail, parentName, childName)
+        mailService.sendDeletionOtherRegAppsEmail(parentEmail, parentName, childName, semester)
     } catch (e) {
         return e
     }
