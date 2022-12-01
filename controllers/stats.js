@@ -261,13 +261,13 @@ exports.groupParentsForSemester = async (req, res) => {
                 COUNT(u.${groupOption}) AS count
             FROM
                 register_application ra
-            LEFT OUTER JOIN child c ON
-                ra.childId = c.id AND ra.semesterId = ${req.params.id}
-            LEFT OUTER JOIN user u ON
+            INNER JOIN child c ON
+                ra.childId = c.id AND ra.semesterId = :id
+            INNER JOIN user u ON
                 c.userId = u.id
             GROUP BY
                 u.${groupOption}`,
-            { raw: true, type: sequelize.QueryTypes.SELECT }
+            { raw: true, type: sequelize.QueryTypes.SELECT, replacements: { id: req.params.id } }
         )
 
         res.status(200).send(apps)
@@ -302,14 +302,14 @@ exports.frequencyOfNumberOfChildrenForSemester = async (req, res) => {
                 FROM
                     register_application ra
                 INNER JOIN child c ON
-                    ra.childId = c.id AND ra.semesterId = ${req.params.id}
+                    ra.childId = c.id AND ra.semesterId = :id
                 GROUP BY
                     c.userId
             ) AS T
             GROUP BY
                 T.NumberOfChildrenForSameParent
             ` ,
-            { raw: true, type: sequelize.QueryTypes.SELECT }
+            { raw: true, type: sequelize.QueryTypes.SELECT, replacements: { id: req.params.id } }
         )
 
         res.status(200).send(result)
