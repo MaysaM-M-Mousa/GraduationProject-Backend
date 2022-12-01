@@ -1,4 +1,4 @@
-const { Semester, User_Kindergarten, Kindergarten, Child } = require('../models/associations')
+const { Semester, User_Kindergarten, Kindergarten, Child, RegisterApplication, REGISTER_APPLICATION_STATUS, User } = require('../models/associations')
 const { ROLES } = require('../models/role')
 const { Op } = require('sequelize')
 const { CHILD_STATUS } = require('../models/childstatus')
@@ -90,8 +90,24 @@ exports.getAllEnrolledChildrenForSemester = async (req, res) => {
             return res.status(401).send({ msg: "This kindergarten does not belong to you!" })
         }
 
+        const options = { semesterId: req.params.id }
+
+        if (Object.values(REGISTER_APPLICATION_STATUS).includes(Number(req.query.applicationStatus))) {
+            options['ApplicationStatus'] = req.query.applicationStatus
+        }
+
+        const includedTables = [{
+            attributes: [],
+            model: RegisterApplication,
+            where: options
+        }]
+
+        if (req.query.includeParent === "true") {
+            includedTables.push({model: User, attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'city', 'country']})
+        }
+
         const children = await Child.findAndCountAll({
-            where: { kindergartenId: semester.kindergartenId, childStatusId: CHILD_STATUS.Enrolled },
+            include: includedTables,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
             distinct: true
@@ -99,6 +115,7 @@ exports.getAllEnrolledChildrenForSemester = async (req, res) => {
 
         res.status(200).send(children)
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 }
