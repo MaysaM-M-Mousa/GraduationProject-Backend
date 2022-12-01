@@ -17,6 +17,7 @@ exports.createSubscription = async (req, res) => {
 
         const isAlreadySubscribed = await Subscription.findAll({
             where: {
+                kindergartenId: req.body.kindergartenId,
                 endTime: {
                     [Op.gte]: new Date().toISOString().slice(0, 10)
                 }
