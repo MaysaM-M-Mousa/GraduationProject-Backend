@@ -21,7 +21,8 @@ const REGISTER_APPLICATION_STATUS = {
     UNDER_REVIEW: 1,
     APPROVED: 2,
     CONFIRMED: 3,
-    REJECTED: 4
+    REJECTED: 4,
+    DISMESSED: 5
 }
 
 module.exports = { RegisterApplication, REGISTER_APPLICATION_STATUS }

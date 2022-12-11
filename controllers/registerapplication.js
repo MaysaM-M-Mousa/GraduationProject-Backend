@@ -164,7 +164,7 @@ exports.updateRegApp = async (req, res) => {
         const child = await Child.findOne({ where: { id: app.childId }, include: User })
 
         if (newStatus == REGISTER_APPLICATION_STATUS.APPROVED) {
-            await mailService.sendRegAppApprovalEmail('maysam.m.mousa@gmail.com', child.user.firstName, child.firstName, app.semester)
+            await mailService.sendRegAppApprovalEmail(child.user.email, child.user.firstName, child.firstName, app.semester)
         } else if (newStatus == REGISTER_APPLICATION_STATUS.REJECTED) {
             await mailService.sendRegAppRejectionEmail(child.user.email, child.user.firstName, child.firstName, app.semester)
         } else if (newStatus == REGISTER_APPLICATION_STATUS.CONFIRMED) {
@@ -179,7 +179,6 @@ exports.updateRegApp = async (req, res) => {
 
         return res.status(200).send(app)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }
@@ -206,9 +205,11 @@ exports.deleteRegApp = async (req, res) => {
 
 const deleteOtherRegApps = async (childId, parentEmail, parentName, childName, semester) => {
     try {
-        await RegisterApplication.destroy({
-            where: { childId: childId, application_status: REGISTER_APPLICATION_STATUS.UNDER_REVIEW }
-        })
+        await RegisterApplication.update(
+            { ApplicationStatus: REGISTER_APPLICATION_STATUS.DISMESSED },
+            {
+                where: { childId: childId, application_status: REGISTER_APPLICATION_STATUS.UNDER_REVIEW }
+            })
         mailService.sendDeletionOtherRegAppsEmail(parentEmail, parentName, childName, semester)
     } catch (e) {
         return e
