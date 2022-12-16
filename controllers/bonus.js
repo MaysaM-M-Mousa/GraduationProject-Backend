@@ -1,5 +1,6 @@
 const { Bonus, Job, Employee, User_Kindergarten } = require('../models/associations')
 const { ROLES } = require("../models/role")
+const { Op } = require('sequelize')
 
 exports.createBonus = async (req, res) => {
     try {
@@ -136,8 +137,25 @@ exports.getAllBonusesForKindergarten = async (req, res) => {
             return res.status(401).send({ msg: "This kindergarten does not belong to you!" })
         }
 
+        const search = req.query.searchQuery != undefined ? req.query.searchQuery : ""
+
+        employeeFilter = {
+            [Op.or]: [
+                { firstName: { [Op.like]: `%${search}%` } },
+                { lastName: { [Op.like]: `%${search}%` } },
+                { email: { [Op.like]: `%${search}%` } },
+                { phone: { [Op.like]: `%${search}%` } },
+                { country: { [Op.like]: `%${search}%` } },
+                { city: { [Op.like]: `%${search}%` } }]
+        }
+
+        const options = {
+            model: Employee, required: true, where: employeeFilter,
+            include: { model: Job, required: true, where: { kindergartenId: req.params.id } }
+        }
+
         const bonuses = await Bonus.findAndCountAll({
-            include: { model: Employee, required: true, include: { model: Job, required: true, where: { kindergartenId: req.params.id } } },
+            include: options,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
             distinct: true
@@ -153,7 +171,6 @@ exports.getAllBonusesForKindergarten = async (req, res) => {
 
         res.status(200).send(bonuses)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }
