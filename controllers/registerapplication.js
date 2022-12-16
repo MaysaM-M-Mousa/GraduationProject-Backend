@@ -2,6 +2,8 @@ const { Kindergarten, RegisterApplication, REGISTER_APPLICATION_STATUS, Child, U
 const { CHILD_STATUS } = require("../models/childstatus")
 const { ROLES } = require("../models/role")
 const mailService = require('../utilities/mailUtil')
+const { Op } = require('sequelize')
+const sequelize = require('sequelize')
 
 exports.createRegistrationApplication = async (req, res) => {
     try {
@@ -81,7 +83,7 @@ exports.getRegisterApplicationById = async (req, res) => {
     }
 }
 
-exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
+exports.getAllRegisterApplicationForSemester = async (req, res) => {
     const MAX_PAGE_SIZE = 10
 
     const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
@@ -89,12 +91,20 @@ exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
 
     includedTables = []
 
+    const search = req.query.searchQuery
+    const childSearchOptions = {
+        [Op.or]: [
+            { firstName: { [Op.like]: `%${search}%` } },
+            { middleName: { [Op.like]: `%${search}%` } },
+            { lastName: { [Op.like]: `%${search}%` } }]
+    }
+
     if (req.query.includeChild === "true") {
         arr = []
         if (req.query.includeParent === "true") {
-            arr.push(User)
+            arr.push({ model: User, attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'city', 'country'] })
         }
-        includedTables.push({ model: Child, include: arr })
+        includedTables.push({ model: Child, include: arr, where: search != undefined ? childSearchOptions : {} })
     }
 
     try {
@@ -124,6 +134,7 @@ exports.getAllRegisterApplicationForKindergarten = async (req, res) => {
 
         res.status(200).send(apps)
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 }
