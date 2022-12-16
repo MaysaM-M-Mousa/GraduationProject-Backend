@@ -3,6 +3,7 @@ const { User, Child, ChildStatus, RegisterApplication, REGISTER_APPLICATION_STAT
 const Kindergartedn = require('../models/kindergarten')
 const { ROLES } = require('../models/role')
 const getImagesUtil = require('../utilities/getImagesUtil')
+const { Op } = require('sequelize')
 
 exports.createChild = async (req, res) => {
 
@@ -120,7 +121,22 @@ exports.getAllChildren = async (req, res) => {
             includedTables.push(Kindergartedn)
         }
 
+        const search = req.query.searchQuery
+
+        var filter = {}
+
+        if (search != undefined) {
+            filter = {
+                [Op.or]: [
+                    { firstName: { [Op.like]: `%${search}%` } },
+                    { middleName: { [Op.like]: `%${search}%` } },
+                    { lastName: { [Op.like]: `%${search}%` } }
+                ]
+            }
+        }
+
         const children = await Child.findAndCountAll({
+            where: filter,
             include: includedTables,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
