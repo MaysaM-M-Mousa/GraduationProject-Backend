@@ -1,6 +1,7 @@
 const { User, Token, Child, ChildStatus, Kindergarten } = require('../models/associations')
 const { ROLES, Role } = require('../models/role')
 const getImagesUtil = require('../utilities/getImagesUtil')
+const { Op } = require('sequelize')
 
 exports.createUser = async (req, res) => {
     req.body.roleId = (req.body.isKindergartenOwner === true) ? ROLES.KindergartenOwner : ROLES.Parent
@@ -94,8 +95,22 @@ exports.getAllUsers = async (req, res) => {
             includedTables.push(Role)
         }
 
-        const filter = req.query.role != undefined && Object.values(ROLES).includes(parseInt(req.query.role))
-            ? { roleId: req.query.role } : {}
+        const search = req.query.searchQuery != undefined ? req.query.searchQuery : ""
+
+        const filter = {
+            [Op.or]: [
+                { firstName: { [Op.like]: `%${search}%` } },
+                { lastName: { [Op.like]: `%${search}%` } },
+                { email: { [Op.like]: `%${search}%` } },
+                { phone: { [Op.like]: `%${search}%` } },
+                { country: { [Op.like]: `%${search}%` } },
+                { city: { [Op.like]: `%${search}%` } }
+            ]
+        }
+
+        if(req.query.role != undefined && Object.values(ROLES).includes(parseInt(req.query.role))){
+            filter['roleId'] =  req.query.role
+        }
 
         const users = await User.findAndCountAll({
             where: filter,
@@ -107,6 +122,7 @@ exports.getAllUsers = async (req, res) => {
 
         res.status(200).send(users)
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 }
