@@ -1,7 +1,7 @@
-const { response } = require('express')
-const { User, Child, ChildStatus, RegisterApplication, REGISTER_APPLICATION_STATUS } = require('../models/associations')
+const { User, Child, ChildStatus, RegisterApplication } = require('../models/associations')
 const Kindergartedn = require('../models/kindergarten')
 const { ROLES } = require('../models/role')
+const { CHILD_STATUS } = require('../models/childstatus')
 const getImagesUtil = require('../utilities/getImagesUtil')
 const { Op } = require('sequelize')
 
@@ -135,6 +135,10 @@ exports.getAllChildren = async (req, res) => {
             }
         }
 
+        if (Object.values(CHILD_STATUS).includes(Number(req.query.childStatus))) {
+            filter['childStatusId'] = req.query.childStatus
+        }
+        
         const children = await Child.findAndCountAll({
             where: filter,
             include: includedTables,
