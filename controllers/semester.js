@@ -58,9 +58,17 @@ exports.getAllSemestersForKindergarten = async (req, res) => {
     const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
     const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
 
+    const options = { kindergartenId: req.params.id }
+
+    const search = req.query.searchQuery
+
+    if (search != undefined) {
+        options['name'] = { [Op.like]: `%${search}%` }
+    }
+
     try {
         const semester = await Semester.findAndCountAll({
-            where: { kindergartenId: req.params.id },
+            where: options,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
             distinct: true
@@ -103,7 +111,7 @@ exports.getAllEnrolledChildrenForSemester = async (req, res) => {
         }]
 
         if (req.query.includeParent === "true") {
-            includedTables.push({model: User, attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'city', 'country']})
+            includedTables.push({ model: User, attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'city', 'country'] })
         }
 
         const children = await Child.findAndCountAll({
