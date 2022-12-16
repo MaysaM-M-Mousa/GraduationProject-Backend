@@ -1,5 +1,6 @@
 const { Employee, Job, User_Kindergarten, Kindergarten } = require("../models/associations")
 const { ROLES } = require("../models/role")
+const { Op } = require('sequelize')
 
 exports.createEmployee = async (req, res) => {
     try {
@@ -22,8 +23,7 @@ exports.createEmployee = async (req, res) => {
 
         res.status(201).send(employee)
     } catch (e) {
-        console.log(e)
-        res.status(500).send()
+        res.status(400).send(e)
     }
 }
 
@@ -117,6 +117,22 @@ exports.getAllEmployeesForKindergarten = async (req, res) => {
 
     includedTables.push(opts)
 
+    var filter = {}
+
+    const search = req.query.searchQuery
+
+    if (search != undefined) {
+        filter = {
+            [Op.or]: [
+                { firstName: { [Op.like]: `%${search}%` } },
+                { lastName: { [Op.like]: `%${search}%` } },
+                { email: { [Op.like]: `%${search}%` } },
+                { phone: { [Op.like]: `%${search}%` } },
+                { country: { [Op.like]: `%${search}%` } },
+                { city: { [Op.like]: `%${search}%` } }]
+        }
+    }
+
     try {
         if (req.user.roleId == ROLES.KindergartenOwner &&
             !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: req.params.id } })) {
@@ -124,6 +140,7 @@ exports.getAllEmployeesForKindergarten = async (req, res) => {
         }
 
         const employees = await Employee.findAndCountAll({
+            where: filter,
             include: includedTables,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
@@ -138,7 +155,7 @@ exports.getAllEmployeesForKindergarten = async (req, res) => {
 
 exports.updateEmployee = async (req, res) => {
     const updates = Object.keys(req.body)
-    const allowedUpdates = ["firstName", "lastName", "email", "phone", "country", "city", "hireDate", "endDate","dateOfBirth", "salary"]
+    const allowedUpdates = ["firstName", "lastName", "email", "phone", "country", "city", "hireDate", "endDate", "dateOfBirth", "salary"]
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
 
     if (!isValidOperation) {
