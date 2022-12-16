@@ -1,5 +1,7 @@
 const { Job, User_Kindergarten, Kindergarten } = require("../models/associations")
 const { ROLES } = require("../models/role")
+const { Op } = require('sequelize')
+const sequelize = require('sequelize')
 
 exports.createJob = async (req, res) => {
     try {
@@ -51,6 +53,15 @@ exports.getAllJobsForKindergarten = async (req, res) => {
         includedTables.push(Kindergarten)
     }
 
+    const search = req.query.searchQuery
+
+    const options = search != undefined ? {
+        kindergartenId: req.params.id,
+        [Op.or]: [
+            { jobTitle: { [Op.like]: `%${search}%` } },
+            { description: { [Op.like]: `%${search}%` } }]
+    } : { kindergartenId: req.params.id }
+
     try {
         if (req.user.roleId == ROLES.KindergartenOwner &&
             !await User_Kindergarten.findOne({ where: { userId: req.user.id, kindergartenId: req.params.id } })) {
@@ -58,7 +69,7 @@ exports.getAllJobsForKindergarten = async (req, res) => {
         }
 
         const jobs = await Job.findAndCountAll({
-            where: { kindergartenId: req.params.id },
+            where: options,
             include: includedTables,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
