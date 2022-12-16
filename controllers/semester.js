@@ -114,7 +114,16 @@ exports.getAllEnrolledChildrenForSemester = async (req, res) => {
             includedTables.push({ model: User, attributes: ['id', 'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'city', 'country'] })
         }
 
+        const search = req.query.searchQuery
+        const searchOptions = search != undefined ? {
+            [Op.or]:
+                [{ firstName: { [Op.like]: `%${search}%` } },
+                { middleName: { [Op.like]: `%${search}%` } },
+                { lastName: { [Op.like]: `%${search}%` } }]
+        } : {}
+
         const children = await Child.findAndCountAll({
+            where: searchOptions,
             include: includedTables,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
@@ -123,7 +132,6 @@ exports.getAllEnrolledChildrenForSemester = async (req, res) => {
 
         res.status(200).send(children)
     } catch (e) {
-        console.log(e)
         res.status(500).send()
     }
 }
