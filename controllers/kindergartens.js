@@ -2,7 +2,6 @@ const { Kindergarten, User, Child, ChildStatus, Semester } = require('../models/
 const { User_Kindergarten } = require('../models/associations')
 const getImagesUtil = require('../utilities/getImagesUtil')
 const { Op } = require('sequelize')
-const sequelize = require('sequelize')
 
 exports.createKindergarten = async (req, res) => {
 
@@ -64,8 +63,26 @@ exports.getAllKindergartens = async (req, res) => {
     const pageNumber = Number((req.query.pageNumber == undefined) ? 1 : req.query.pageNumber)
     const pageSize = Number((req.query.pageSize <= MAX_PAGE_SIZE) ? req.query.pageSize : MAX_PAGE_SIZE)
 
+    const search = req.query.searchQuery
+
+    var filter = {}
+
+    if (search != undefined) {
+        filter = {
+            [Op.or]: [
+                { name: { [Op.like]: `%${search}%` } },
+                { locationFormatted: { [Op.like]: `%${search}%` } },
+                { phone: { [Op.like]: `%${search}%` } },
+                { country: { [Op.like]: `%${search}%` } },
+                { city: { [Op.like]: `%${search}%` } },
+                { email: { [Op.like]: `%${search}%` } }
+            ]
+        }
+    }
+
     try {
         const kindergartens = await Kindergarten.findAndCountAll({
+            where: filter,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
             distinct: true
