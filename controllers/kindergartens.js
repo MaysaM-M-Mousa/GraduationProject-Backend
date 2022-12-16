@@ -1,6 +1,8 @@
 const { Kindergarten, User, Child, ChildStatus, Semester } = require('../models/associations')
 const { User_Kindergarten } = require('../models/associations')
 const getImagesUtil = require('../utilities/getImagesUtil')
+const { Op } = require('sequelize')
+const sequelize = require('sequelize')
 
 exports.createKindergarten = async (req, res) => {
 
@@ -95,7 +97,14 @@ exports.getAllChildrenForKindergarten = async (req, res) => {
         includedTables.push(ChildStatus)
     }
 
-    const filter = { kindergartenId: req.params.id }
+    const search = req.query.searchQuery
+    const filter = search != undefined ? {
+        kindergartenId: req.params.id,
+        [Op.or]: [
+            { firstName: { [Op.like]: `%${search}%` } },
+            { middleName: { [Op.like]: `%${search}%` } },
+            { lastName: { [Op.like]: `%${search}%` } }]
+    } : { kindergartenId: req.params.id }
 
     try {
         const children = await Child.findAndCountAll({
