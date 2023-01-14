@@ -80,13 +80,29 @@ exports.getAllKindergartens = async (req, res) => {
         }
     }
 
+    const includedTables = []
+    const today = new Date().toISOString().slice(0, 10)
+
+    if (req.query.includeRunningSemester === "true") {
+        includedTables.push({ model: Semester, where: { endDate: { [Op.gte]: today } } })
+    }
+
     try {
         const kindergartens = await Kindergarten.findAndCountAll({
             where: filter,
             offset: (pageNumber - 1) * pageSize,
             limit: pageSize,
-            distinct: true
+            distinct: true,
+            include: includedTables
         })
+
+        if(req.query.includeRunningSemester === "true"){
+            for (var i = 0; i < kindergartens.rows.length; i++) {
+                const semesterToInsert = kindergartens.rows[i].dataValues.semesters[0]
+                delete kindergartens.rows[i].dataValues.semesters
+                kindergartens.rows[i].dataValues.runningSemester = semesterToInsert
+            }
+        }
 
         if (req.query.includeImages === "true") {
             for (var i = 0; i < kindergartens.rows.length; i++) {
