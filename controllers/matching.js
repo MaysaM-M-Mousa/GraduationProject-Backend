@@ -2,7 +2,7 @@ const { Kindergarten, Semester } = require('../models/associations')
 const { Op } = require('sequelize')
 const haversine = require('haversine-distance')
 const getImagesUtil = require('../utilities/getImagesUtil')
-const sequelize = require('sequelize')
+const axios = require('axios')
 
 exports.searchForKindergartens = async (req, res) => {
     const MAX_PAGE_SIZE = 10
@@ -82,5 +82,60 @@ exports.searchForKindergartens = async (req, res) => {
         res.status(200).send(kindergartens)
     } catch (e) {
         res.status(500).send()
+    }
+}
+
+exports.matchUserInputToKindergartens = async (req, res) => {
+    const today = new Date().toISOString().slice(0, 10)
+    const kindergartensSortedBasedOnSimilarity = []
+
+    try {
+        const response = await axios({
+            url: `${process.env.MATCHING_MODEL_URL}`,
+            method: 'POST',
+            data: req.body,
+        })
+
+        const similarities = response.data.result.similarity
+
+        // retrieving Ids for most similar kindergartens
+        const Ids = Object.keys(similarities)
+
+        // retrieve kindergartens by Ids and active semesters
+        const kindergartens = await Kindergarten.findAll({
+            where: { id: Ids },
+            include: [{ model: Semester, where: { endDate: { [Op.gte]: today } } }],
+            raw: true,
+            nest: true
+        })
+
+        // renaming "semesters" property in each object to "runningSemester"
+        kindergartens.forEach(k => delete Object.assign(k, { ['runningSemester']: k['semesters'] })['semesters'])
+
+        // converting kindergartens to hashmap indexed by the id of kindergarten
+        const kindergartensHashMap = kindergartens.reduce(function (map, k) { map[k.id] = k; return map; }, {});
+
+        // sorting the similarities according to the value which is the similarity
+        const sortedIdsBasedOnSimilarity = Object.keys(similarities).sort(function (a, b) { return similarities[a] - similarities[b] })
+
+        // iterating throgh sorted Ids array based on similarity and push kindergartens 
+        sortedIdsBasedOnSimilarity.forEach(id => kindergartensSortedBasedOnSimilarity.push(kindergartensHashMap[id]))
+
+        kindergartensSortedBasedOnSimilarity.forEach(k => k.imgs = [])
+        kindergartensSortedBasedOnSimilarity.forEach(k => k.distanceInKm = 0)
+        // kindergartensSortedBasedOnSimilarity.imgs = []
+        // kindergartensSortedBasedOnSimilarity.distanceInKm = 0
+
+        // kindergartensSortedBasedOnSimilarity.forEach(k => {
+        //     const distance = (haversine({ lat: req.body.data.latitude, lng: req.body.data.longitude }, { lat: k.latitude, lng: k.longitude }) / 1000)
+        //     k.distanceInKm = distance
+        //     return k
+        // })
+
+        res.status(200).send({count: 10, rows: kindergartensSortedBasedOnSimilarity})
+    } catch (e) {
+        // res.status(400).send({ error_message: e.message, information: "Please check if your sending all required parameters" })
+        console.log(e)
+        res.status(400).send(e)
     }
 }
